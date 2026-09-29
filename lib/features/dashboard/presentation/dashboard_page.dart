@@ -1,0 +1,206 @@
+import 'package:flutter/material.dart';
+
+import '../../../core/database/database_provider.dart';
+import '../../../shared/widgets/section_card.dart';
+import '../../foods/data/food_repository_impl.dart';
+import '../../foods/data/category_repository.dart';
+import '../../meals/data/meal_repository_impl.dart';
+import '../../meals/domain/meal_repository.dart';
+import '../../meals/presentation/meal_entry_page.dart';
+import '../../reactions/data/reaction_repository_impl.dart';
+import '../../reactions/domain/reaction_repository.dart';
+import '../../reactions/presentation/reaction_entry_page.dart';
+
+class DashboardPage extends StatefulWidget {
+  const DashboardPage({super.key});
+
+  @override
+  State<DashboardPage> createState() => _DashboardPageState();
+}
+
+class _DashboardPageState extends State<DashboardPage> {
+  late final MealRepositoryImpl _meals;
+  late final FoodRepositoryImpl _foods;
+  late final CategoryRepository _categories;
+  late final ReactionRepositoryImpl _reactions;
+  late Future<List<MealSummary>> _today;
+  late Future<List<ReactionSummary>> _todayReactions;
+
+  @override
+  void initState() {
+    super.initState();
+    _meals = MealRepositoryImpl(appDatabase);
+    _foods = FoodRepositoryImpl(appDatabase);
+    _categories = CategoryRepositoryImpl(appDatabase);
+    _reactions = ReactionRepositoryImpl(appDatabase);
+    _load();
+  }
+
+  void _load() {
+    _today = _meals.forDay(DateTime.now());
+    _todayReactions = _reactions.forDay(DateTime.now());
+  }
+
+  Future<void> _openReaction() async {
+    final saved = await Navigator.of(context).push<bool>(MaterialPageRoute(
+      builder: (_) => ReactionEntryPage(repository: _reactions),
+    ));
+    if (saved == true && mounted) setState(_load);
+  }
+
+  Future<void> _finishReaction(ReactionSummary reaction) async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Finalizar reacción'),
+        content: const Text('Se registrará la hora actual como finalización.'),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(context, false), child: const Text('Cancelar')),
+          FilledButton(onPressed: () => Navigator.pop(context, true), child: const Text('Finalizar')),
+        ],
+      ),
+    );
+    if (confirmed != true) return;
+    try {
+      await _reactions.finish(reaction.id, DateTime.now());
+      if (mounted) setState(_load);
+    } on FormatException catch (error) {
+      if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(error.message)));
+    }
+  }
+
+  Future<void> _openMeal(MealType type) async {
+    final saved = await Navigator.of(context).push<bool>(MaterialPageRoute(
+      builder: (_) => MealEntryPage(type: type, foodRepository: _foods, categoryRepository: _categories, mealRepository: _meals),
+    ));
+    if (saved == true && mounted) setState(_load);
+  }
+
+  Future<void> _chooseMealType() async {
+    final type = await showModalBottomSheet<MealType>(
+      context: context,
+      showDragHandle: true,
+      builder: (context) => SafeArea(
+        child: Column(mainAxisSize: MainAxisSize.min, children: MealType.values.map((type) => ListTile(
+              leading: Icon(_mealIcon(type)),
+              title: Text(mealTypeLabel(type)),
+              onTap: () => Navigator.pop(context, type),
+            )).toList()),
+      ),
+    );
+    if (type != null && mounted) _openMeal(type);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final now = DateTime.now();
+    final date = '${now.day} de ${_months[now.month - 1]}';
+    return Scaffold(
+      appBar: AppBar(title: const Text('Diario Alimentario')),
+      body: FutureBuilder<List<MealSummary>>(
+        future: _today,
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) return const Center(child: CircularProgressIndicator());
+          if (snapshot.hasError) return const Center(child: Text('No se pudo cargar el día.'));
+          final meals = snapshot.data ?? [];
+          return ListView(
+            padding: const EdgeInsets.fromLTRB(20, 8, 20, 28),
+            children: [
+              Text('Hoy, $date', style: Theme.of(context).textTheme.headlineSmall),
+              const SizedBox(height: 6),
+              Text('Registra lo que consumes y cómo te sientes.', style: Theme.of(context).textTheme.bodyLarge),
+              const SizedBox(height: 22),
+              Row(children: [
+                Expanded(child: FilledButton.icon(onPressed: _chooseMealType, icon: const Icon(Icons.restaurant), label: const Text('Comida'))),
+                const SizedBox(width: 12),
+                Expanded(child: OutlinedButton.icon(onPressed: _openReaction, icon: const Icon(Icons.favorite_border), label: const Text('Reacción'))),
+              ]),
+              const SizedBox(height: 24),
+              ...MealType.values.map((type) => Padding(
+                    padding: const EdgeInsets.only(bottom: 16),
+                    child: _MealSection(type: type, meals: meals.where((meal) => meal.type == type).toList(), onAdd: () => _openMeal(type)),
+                  )),
+              FutureBuilder<List<ReactionSummary>>(
+                future: _todayReactions,
+                builder: (context, reactionSnapshot) {
+                  if (reactionSnapshot.connectionState == ConnectionState.waiting) return const LinearProgressIndicator();
+                  final reactions = reactionSnapshot.data ?? [];
+                  return SectionCard(
+                    title: 'Reacciones del día',
+                    icon: Icons.monitor_heart_outlined,
+                    color: Colors.deepOrange,
+                    child: Column(children: [
+                      if (reactions.isEmpty)
+                        const Align(alignment: Alignment.centerLeft, child: Text('Todavía no hay reacciones registradas.'))
+                      else
+                        ...reactions.map((reaction) => ListTile(
+                              contentPadding: EdgeInsets.zero,
+                              title: Text(_timeLabel(reaction.startedAt)),
+                              subtitle: Text('${reaction.symptoms.join(' · ')}\n${_intensityLabel(reaction.intensity)}${reaction.status == ReactionStatus.active ? ' · Continúa' : ''}'),
+                              trailing: reaction.status == ReactionStatus.active
+                                  ? TextButton(onPressed: () => _finishReaction(reaction), child: const Text('Finalizar'))
+                                  : null,
+                            )),
+                      Align(alignment: Alignment.centerRight, child: TextButton.icon(onPressed: _openReaction, icon: const Icon(Icons.add), label: const Text('Registrar reacción'))),
+                    ]),
+                  );
+                },
+              ),
+            ],
+          );
+        },
+      ),
+    );
+  }
+}
+
+class _MealSection extends StatelessWidget {
+  const _MealSection({required this.type, required this.meals, required this.onAdd});
+
+  final MealType type;
+  final List<MealSummary> meals;
+  final VoidCallback onAdd;
+
+  @override
+  Widget build(BuildContext context) {
+    return SectionCard(
+      title: mealTypeLabel(type),
+      icon: _mealIcon(type),
+      child: Column(children: [
+        if (meals.isEmpty)
+          const Align(alignment: Alignment.centerLeft, child: Text('Aún no registrado'))
+        else
+          ...meals.map((meal) => ListTile(
+                contentPadding: EdgeInsets.zero,
+                title: Text(_timeLabel(meal.mealDatetime)),
+                subtitle: Text(meal.foodNames.join(' · ')),
+              )),
+        Align(alignment: Alignment.centerRight, child: TextButton.icon(onPressed: onAdd, icon: const Icon(Icons.add), label: const Text('Registrar'))),
+      ]),
+    );
+  }
+}
+
+IconData _mealIcon(MealType type) {
+  switch (type) {
+    case MealType.breakfast:
+      return Icons.free_breakfast_outlined;
+    case MealType.lunch:
+      return Icons.lunch_dining_outlined;
+    case MealType.dinner:
+      return Icons.dinner_dining_outlined;
+    case MealType.snack:
+      return Icons.cookie_outlined;
+  }
+}
+
+String _timeLabel(DateTime date) => '${date.hour.toString().padLeft(2, '0')}:${date.minute.toString().padLeft(2, '0')}';
+
+String _intensityLabel(int value) => switch (value) {
+      1 => 'Leve',
+      2 => 'Moderada',
+      3 => 'Fuerte',
+      _ => 'Sin intensidad',
+    };
+
+const _months = ['enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio', 'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre'];
