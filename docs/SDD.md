@@ -44,6 +44,7 @@ La publicación en Google Play será una fase posterior y no forma parte de la g
 
 ### Requisitos técnicos
 
+- `applicationId`: `com.jhidmer.diarioalimentario`.
 - Mantener `targetSdkVersion` igual o superior al mínimo vigente de Google Play.
 - Publicar un Android App Bundle (`.aab`) en lugar de un APK debug.
 - Configurar firma release y Play App Signing.
