@@ -13,6 +13,9 @@ import '../../reactions/data/reaction_repository_impl.dart';
 import '../../reactions/domain/reaction_repository.dart';
 import '../../reactions/presentation/reaction_entry_page.dart';
 import '../../reactions/presentation/reaction_detail_page.dart';
+import '../../context/data/context_repository_impl.dart';
+import '../../context/domain/context_repository.dart';
+import '../../context/presentation/context_entry_page.dart';
 
 class DashboardPage extends StatefulWidget {
   const DashboardPage({super.key});
@@ -26,6 +29,7 @@ class _DashboardPageState extends State<DashboardPage> {
   late final FoodRepositoryImpl _foods;
   late final CategoryRepository _categories;
   late final ReactionRepositoryImpl _reactions;
+  late final ContextRepositoryImpl _context;
   late final MealTemplateRepositoryImpl _templates;
   late Future<List<MealSummary>> _today;
   late Future<List<ReactionSummary>> _todayReactions;
@@ -37,6 +41,7 @@ class _DashboardPageState extends State<DashboardPage> {
     _foods = FoodRepositoryImpl(appDatabase);
     _categories = CategoryRepositoryImpl(appDatabase);
     _reactions = ReactionRepositoryImpl(appDatabase);
+    _context = ContextRepositoryImpl(appDatabase);
     _templates = MealTemplateRepositoryImpl(appDatabase);
     _load();
   }
@@ -44,6 +49,14 @@ class _DashboardPageState extends State<DashboardPage> {
   void _load() {
     _today = _meals.forDay(DateTime.now());
     _todayReactions = _reactions.forDay(DateTime.now());
+  }
+
+  Future<void> _openContext() async {
+    final date = DateTime.now();
+    final current = await _context.forDay(date);
+    if (!mounted) return;
+    final saved = await Navigator.of(context).push<bool>(MaterialPageRoute(builder: (_) => ContextEntryPage(repository: _context, date: date, initial: current)));
+    if (saved == true && mounted) setState(_load);
   }
 
   Future<void> _openReaction() async {
@@ -177,6 +190,19 @@ class _DashboardPageState extends State<DashboardPage> {
                     padding: const EdgeInsets.only(bottom: 16),
                     child: _MealSection(type: type, meals: meals.where((meal) => meal.type == type).toList(), onAdd: () => _openMeal(type), onOpen: _openMealDetail, onEdit: _editMeal, onDelete: _deleteMeal),
                   )),
+              FutureBuilder<DailyContextSummary?>(
+                future: _context.forDay(DateTime.now()),
+                builder: (context, snapshot) {
+                  final value = snapshot.data;
+                  return Card(child: ListTile(
+                    leading: const Icon(Icons.self_improvement),
+                    title: const Text('Sueño y estrés'),
+                    subtitle: Text(value == null ? 'Agrega contexto para encontrar más patrones.' : 'Sueño: ${value.sleepMinutes ?? '-'} min · Estrés: ${_contextLevel(value.stress)}'),
+                    trailing: const Icon(Icons.chevron_right),
+                    onTap: _openContext,
+                  ));
+                },
+              ),
               FutureBuilder<List<ReactionSummary>>(
                 future: _todayReactions,
                 builder: (context, reactionSnapshot) {
@@ -271,5 +297,7 @@ String _intensityLabel(int value) => switch (value) {
       3 => 'Fuerte',
       _ => 'Sin intensidad',
     };
+
+String _contextLevel(int? value) => switch (value) { 1 => 'bajo', 2 => 'medio', 3 => 'alto', _ => '-' };
 
 const _months = ['enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio', 'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre'];

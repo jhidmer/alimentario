@@ -179,6 +179,12 @@ Cada comida y reacción tendrá una vista de detalle accesible desde Hoy e Histo
 
 Estado: implementada para comidas y reacciones, incluyendo fotografías de reacciones.
 
+### Mejora 07: Sueño Y Estrés
+
+El usuario podrá registrar opcionalmente minutos dormidos, calidad del sueño, nivel de estrés y notas del día. Estos datos se almacenarán localmente y podrán relacionarse con tendencias futuras, sin afirmar causalidad.
+
+Estado: persistencia local y registro diario implementados desde Hoy.
+
 ### Mejora 05: Confianza Estadística
 
 Los patrones mostrarán siempre el tamaño de muestra y no solo el porcentaje. Se aplicarán estas etiquetas orientativas:

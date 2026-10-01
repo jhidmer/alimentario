@@ -2025,6 +2025,516 @@ class MealTemplateFoodsCompanion extends UpdateCompanion<MealTemplateFood> {
   }
 }
 
+class $DailyContextsTable extends DailyContexts
+    with TableInfo<$DailyContextsTable, DailyContext> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $DailyContextsTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<int> id = GeneratedColumn<int>(
+    'id',
+    aliasedName,
+    false,
+    hasAutoIncrement: true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'PRIMARY KEY AUTOINCREMENT',
+    ),
+  );
+  static const VerificationMeta _dateMeta = const VerificationMeta('date');
+  @override
+  late final GeneratedColumn<DateTime> date = GeneratedColumn<DateTime>(
+    'date',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _sleepMinutesMeta = const VerificationMeta(
+    'sleepMinutes',
+  );
+  @override
+  late final GeneratedColumn<int> sleepMinutes = GeneratedColumn<int>(
+    'sleep_minutes',
+    aliasedName,
+    true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _sleepQualityMeta = const VerificationMeta(
+    'sleepQuality',
+  );
+  @override
+  late final GeneratedColumn<int> sleepQuality = GeneratedColumn<int>(
+    'sleep_quality',
+    aliasedName,
+    true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _stressMeta = const VerificationMeta('stress');
+  @override
+  late final GeneratedColumn<int> stress = GeneratedColumn<int>(
+    'stress',
+    aliasedName,
+    true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _notesMeta = const VerificationMeta('notes');
+  @override
+  late final GeneratedColumn<String> notes = GeneratedColumn<String>(
+    'notes',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _createdAtMeta = const VerificationMeta(
+    'createdAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> createdAt = GeneratedColumn<DateTime>(
+    'created_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _updatedAtMeta = const VerificationMeta(
+    'updatedAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> updatedAt = GeneratedColumn<DateTime>(
+    'updated_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: true,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    id,
+    date,
+    sleepMinutes,
+    sleepQuality,
+    stress,
+    notes,
+    createdAt,
+    updatedAt,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'daily_contexts';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<DailyContext> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    }
+    if (data.containsKey('date')) {
+      context.handle(
+        _dateMeta,
+        date.isAcceptableOrUnknown(data['date']!, _dateMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_dateMeta);
+    }
+    if (data.containsKey('sleep_minutes')) {
+      context.handle(
+        _sleepMinutesMeta,
+        sleepMinutes.isAcceptableOrUnknown(
+          data['sleep_minutes']!,
+          _sleepMinutesMeta,
+        ),
+      );
+    }
+    if (data.containsKey('sleep_quality')) {
+      context.handle(
+        _sleepQualityMeta,
+        sleepQuality.isAcceptableOrUnknown(
+          data['sleep_quality']!,
+          _sleepQualityMeta,
+        ),
+      );
+    }
+    if (data.containsKey('stress')) {
+      context.handle(
+        _stressMeta,
+        stress.isAcceptableOrUnknown(data['stress']!, _stressMeta),
+      );
+    }
+    if (data.containsKey('notes')) {
+      context.handle(
+        _notesMeta,
+        notes.isAcceptableOrUnknown(data['notes']!, _notesMeta),
+      );
+    }
+    if (data.containsKey('created_at')) {
+      context.handle(
+        _createdAtMeta,
+        createdAt.isAcceptableOrUnknown(data['created_at']!, _createdAtMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_createdAtMeta);
+    }
+    if (data.containsKey('updated_at')) {
+      context.handle(
+        _updatedAtMeta,
+        updatedAt.isAcceptableOrUnknown(data['updated_at']!, _updatedAtMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_updatedAtMeta);
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  DailyContext map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return DailyContext(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}id'],
+      )!,
+      date: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}date'],
+      )!,
+      sleepMinutes: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}sleep_minutes'],
+      ),
+      sleepQuality: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}sleep_quality'],
+      ),
+      stress: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}stress'],
+      ),
+      notes: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}notes'],
+      ),
+      createdAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}created_at'],
+      )!,
+      updatedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}updated_at'],
+      )!,
+    );
+  }
+
+  @override
+  $DailyContextsTable createAlias(String alias) {
+    return $DailyContextsTable(attachedDatabase, alias);
+  }
+}
+
+class DailyContext extends DataClass implements Insertable<DailyContext> {
+  final int id;
+  final DateTime date;
+  final int? sleepMinutes;
+  final int? sleepQuality;
+  final int? stress;
+  final String? notes;
+  final DateTime createdAt;
+  final DateTime updatedAt;
+  const DailyContext({
+    required this.id,
+    required this.date,
+    this.sleepMinutes,
+    this.sleepQuality,
+    this.stress,
+    this.notes,
+    required this.createdAt,
+    required this.updatedAt,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<int>(id);
+    map['date'] = Variable<DateTime>(date);
+    if (!nullToAbsent || sleepMinutes != null) {
+      map['sleep_minutes'] = Variable<int>(sleepMinutes);
+    }
+    if (!nullToAbsent || sleepQuality != null) {
+      map['sleep_quality'] = Variable<int>(sleepQuality);
+    }
+    if (!nullToAbsent || stress != null) {
+      map['stress'] = Variable<int>(stress);
+    }
+    if (!nullToAbsent || notes != null) {
+      map['notes'] = Variable<String>(notes);
+    }
+    map['created_at'] = Variable<DateTime>(createdAt);
+    map['updated_at'] = Variable<DateTime>(updatedAt);
+    return map;
+  }
+
+  DailyContextsCompanion toCompanion(bool nullToAbsent) {
+    return DailyContextsCompanion(
+      id: Value(id),
+      date: Value(date),
+      sleepMinutes: sleepMinutes == null && nullToAbsent
+          ? const Value.absent()
+          : Value(sleepMinutes),
+      sleepQuality: sleepQuality == null && nullToAbsent
+          ? const Value.absent()
+          : Value(sleepQuality),
+      stress: stress == null && nullToAbsent
+          ? const Value.absent()
+          : Value(stress),
+      notes: notes == null && nullToAbsent
+          ? const Value.absent()
+          : Value(notes),
+      createdAt: Value(createdAt),
+      updatedAt: Value(updatedAt),
+    );
+  }
+
+  factory DailyContext.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return DailyContext(
+      id: serializer.fromJson<int>(json['id']),
+      date: serializer.fromJson<DateTime>(json['date']),
+      sleepMinutes: serializer.fromJson<int?>(json['sleepMinutes']),
+      sleepQuality: serializer.fromJson<int?>(json['sleepQuality']),
+      stress: serializer.fromJson<int?>(json['stress']),
+      notes: serializer.fromJson<String?>(json['notes']),
+      createdAt: serializer.fromJson<DateTime>(json['createdAt']),
+      updatedAt: serializer.fromJson<DateTime>(json['updatedAt']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<int>(id),
+      'date': serializer.toJson<DateTime>(date),
+      'sleepMinutes': serializer.toJson<int?>(sleepMinutes),
+      'sleepQuality': serializer.toJson<int?>(sleepQuality),
+      'stress': serializer.toJson<int?>(stress),
+      'notes': serializer.toJson<String?>(notes),
+      'createdAt': serializer.toJson<DateTime>(createdAt),
+      'updatedAt': serializer.toJson<DateTime>(updatedAt),
+    };
+  }
+
+  DailyContext copyWith({
+    int? id,
+    DateTime? date,
+    Value<int?> sleepMinutes = const Value.absent(),
+    Value<int?> sleepQuality = const Value.absent(),
+    Value<int?> stress = const Value.absent(),
+    Value<String?> notes = const Value.absent(),
+    DateTime? createdAt,
+    DateTime? updatedAt,
+  }) => DailyContext(
+    id: id ?? this.id,
+    date: date ?? this.date,
+    sleepMinutes: sleepMinutes.present ? sleepMinutes.value : this.sleepMinutes,
+    sleepQuality: sleepQuality.present ? sleepQuality.value : this.sleepQuality,
+    stress: stress.present ? stress.value : this.stress,
+    notes: notes.present ? notes.value : this.notes,
+    createdAt: createdAt ?? this.createdAt,
+    updatedAt: updatedAt ?? this.updatedAt,
+  );
+  DailyContext copyWithCompanion(DailyContextsCompanion data) {
+    return DailyContext(
+      id: data.id.present ? data.id.value : this.id,
+      date: data.date.present ? data.date.value : this.date,
+      sleepMinutes: data.sleepMinutes.present
+          ? data.sleepMinutes.value
+          : this.sleepMinutes,
+      sleepQuality: data.sleepQuality.present
+          ? data.sleepQuality.value
+          : this.sleepQuality,
+      stress: data.stress.present ? data.stress.value : this.stress,
+      notes: data.notes.present ? data.notes.value : this.notes,
+      createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
+      updatedAt: data.updatedAt.present ? data.updatedAt.value : this.updatedAt,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('DailyContext(')
+          ..write('id: $id, ')
+          ..write('date: $date, ')
+          ..write('sleepMinutes: $sleepMinutes, ')
+          ..write('sleepQuality: $sleepQuality, ')
+          ..write('stress: $stress, ')
+          ..write('notes: $notes, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('updatedAt: $updatedAt')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(
+    id,
+    date,
+    sleepMinutes,
+    sleepQuality,
+    stress,
+    notes,
+    createdAt,
+    updatedAt,
+  );
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is DailyContext &&
+          other.id == this.id &&
+          other.date == this.date &&
+          other.sleepMinutes == this.sleepMinutes &&
+          other.sleepQuality == this.sleepQuality &&
+          other.stress == this.stress &&
+          other.notes == this.notes &&
+          other.createdAt == this.createdAt &&
+          other.updatedAt == this.updatedAt);
+}
+
+class DailyContextsCompanion extends UpdateCompanion<DailyContext> {
+  final Value<int> id;
+  final Value<DateTime> date;
+  final Value<int?> sleepMinutes;
+  final Value<int?> sleepQuality;
+  final Value<int?> stress;
+  final Value<String?> notes;
+  final Value<DateTime> createdAt;
+  final Value<DateTime> updatedAt;
+  const DailyContextsCompanion({
+    this.id = const Value.absent(),
+    this.date = const Value.absent(),
+    this.sleepMinutes = const Value.absent(),
+    this.sleepQuality = const Value.absent(),
+    this.stress = const Value.absent(),
+    this.notes = const Value.absent(),
+    this.createdAt = const Value.absent(),
+    this.updatedAt = const Value.absent(),
+  });
+  DailyContextsCompanion.insert({
+    this.id = const Value.absent(),
+    required DateTime date,
+    this.sleepMinutes = const Value.absent(),
+    this.sleepQuality = const Value.absent(),
+    this.stress = const Value.absent(),
+    this.notes = const Value.absent(),
+    required DateTime createdAt,
+    required DateTime updatedAt,
+  }) : date = Value(date),
+       createdAt = Value(createdAt),
+       updatedAt = Value(updatedAt);
+  static Insertable<DailyContext> custom({
+    Expression<int>? id,
+    Expression<DateTime>? date,
+    Expression<int>? sleepMinutes,
+    Expression<int>? sleepQuality,
+    Expression<int>? stress,
+    Expression<String>? notes,
+    Expression<DateTime>? createdAt,
+    Expression<DateTime>? updatedAt,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (date != null) 'date': date,
+      if (sleepMinutes != null) 'sleep_minutes': sleepMinutes,
+      if (sleepQuality != null) 'sleep_quality': sleepQuality,
+      if (stress != null) 'stress': stress,
+      if (notes != null) 'notes': notes,
+      if (createdAt != null) 'created_at': createdAt,
+      if (updatedAt != null) 'updated_at': updatedAt,
+    });
+  }
+
+  DailyContextsCompanion copyWith({
+    Value<int>? id,
+    Value<DateTime>? date,
+    Value<int?>? sleepMinutes,
+    Value<int?>? sleepQuality,
+    Value<int?>? stress,
+    Value<String?>? notes,
+    Value<DateTime>? createdAt,
+    Value<DateTime>? updatedAt,
+  }) {
+    return DailyContextsCompanion(
+      id: id ?? this.id,
+      date: date ?? this.date,
+      sleepMinutes: sleepMinutes ?? this.sleepMinutes,
+      sleepQuality: sleepQuality ?? this.sleepQuality,
+      stress: stress ?? this.stress,
+      notes: notes ?? this.notes,
+      createdAt: createdAt ?? this.createdAt,
+      updatedAt: updatedAt ?? this.updatedAt,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<int>(id.value);
+    }
+    if (date.present) {
+      map['date'] = Variable<DateTime>(date.value);
+    }
+    if (sleepMinutes.present) {
+      map['sleep_minutes'] = Variable<int>(sleepMinutes.value);
+    }
+    if (sleepQuality.present) {
+      map['sleep_quality'] = Variable<int>(sleepQuality.value);
+    }
+    if (stress.present) {
+      map['stress'] = Variable<int>(stress.value);
+    }
+    if (notes.present) {
+      map['notes'] = Variable<String>(notes.value);
+    }
+    if (createdAt.present) {
+      map['created_at'] = Variable<DateTime>(createdAt.value);
+    }
+    if (updatedAt.present) {
+      map['updated_at'] = Variable<DateTime>(updatedAt.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('DailyContextsCompanion(')
+          ..write('id: $id, ')
+          ..write('date: $date, ')
+          ..write('sleepMinutes: $sleepMinutes, ')
+          ..write('sleepQuality: $sleepQuality, ')
+          ..write('stress: $stress, ')
+          ..write('notes: $notes, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('updatedAt: $updatedAt')
+          ..write(')'))
+        .toString();
+  }
+}
+
 class $MealFoodsTable extends MealFoods
     with TableInfo<$MealFoodsTable, MealFood> {
   @override
@@ -4587,6 +5097,7 @@ abstract class _$AppDatabase extends GeneratedDatabase {
   late final $MealTemplatesTable mealTemplates = $MealTemplatesTable(this);
   late final $MealTemplateFoodsTable mealTemplateFoods =
       $MealTemplateFoodsTable(this);
+  late final $DailyContextsTable dailyContexts = $DailyContextsTable(this);
   late final $MealFoodsTable mealFoods = $MealFoodsTable(this);
   late final $SymptomsTable symptoms = $SymptomsTable(this);
   late final $ReactionsTable reactions = $ReactionsTable(this);
@@ -4619,6 +5130,10 @@ abstract class _$AppDatabase extends GeneratedDatabase {
   late final Index uqMealTemplateFoodsTemplateFood = Index(
     'uq_meal_template_foods_template_food',
     'CREATE UNIQUE INDEX uq_meal_template_foods_template_food ON meal_template_foods (template_id, food_id)',
+  );
+  late final Index uqDailyContextsDate = Index(
+    'uq_daily_contexts_date',
+    'CREATE UNIQUE INDEX uq_daily_contexts_date ON daily_contexts (date)',
   );
   late final Index idxMealFoodsMealId = Index(
     'idx_meal_foods_meal_id',
@@ -4658,6 +5173,9 @@ abstract class _$AppDatabase extends GeneratedDatabase {
   late final MealTemplateDao mealTemplateDao = MealTemplateDao(
     this as AppDatabase,
   );
+  late final DailyContextDao dailyContextDao = DailyContextDao(
+    this as AppDatabase,
+  );
   late final ReactionDao reactionDao = ReactionDao(this as AppDatabase);
   late final StatisticsDao statisticsDao = StatisticsDao(this as AppDatabase);
   late final SettingsDao settingsDao = SettingsDao(this as AppDatabase);
@@ -4672,6 +5190,7 @@ abstract class _$AppDatabase extends GeneratedDatabase {
     meals,
     mealTemplates,
     mealTemplateFoods,
+    dailyContexts,
     mealFoods,
     symptoms,
     reactions,
@@ -4685,6 +5204,7 @@ abstract class _$AppDatabase extends GeneratedDatabase {
     idxMealsMealDatetime,
     idxMealsMealType,
     uqMealTemplateFoodsTemplateFood,
+    uqDailyContextsDate,
     idxMealFoodsMealId,
     idxMealFoodsFoodId,
     uqMealFoodsMealFood,
@@ -6582,6 +7102,270 @@ typedef $$MealTemplateFoodsTableProcessedTableManager =
       (MealTemplateFood, $$MealTemplateFoodsTableReferences),
       MealTemplateFood,
       PrefetchHooks Function({bool templateId, bool foodId})
+    >;
+typedef $$DailyContextsTableCreateCompanionBuilder =
+    DailyContextsCompanion Function({
+      Value<int> id,
+      required DateTime date,
+      Value<int?> sleepMinutes,
+      Value<int?> sleepQuality,
+      Value<int?> stress,
+      Value<String?> notes,
+      required DateTime createdAt,
+      required DateTime updatedAt,
+    });
+typedef $$DailyContextsTableUpdateCompanionBuilder =
+    DailyContextsCompanion Function({
+      Value<int> id,
+      Value<DateTime> date,
+      Value<int?> sleepMinutes,
+      Value<int?> sleepQuality,
+      Value<int?> stress,
+      Value<String?> notes,
+      Value<DateTime> createdAt,
+      Value<DateTime> updatedAt,
+    });
+
+class $$DailyContextsTableFilterComposer
+    extends Composer<_$AppDatabase, $DailyContextsTable> {
+  $$DailyContextsTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get date => $composableBuilder(
+    column: $table.date,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get sleepMinutes => $composableBuilder(
+    column: $table.sleepMinutes,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get sleepQuality => $composableBuilder(
+    column: $table.sleepQuality,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get stress => $composableBuilder(
+    column: $table.stress,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get notes => $composableBuilder(
+    column: $table.notes,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get updatedAt => $composableBuilder(
+    column: $table.updatedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+}
+
+class $$DailyContextsTableOrderingComposer
+    extends Composer<_$AppDatabase, $DailyContextsTable> {
+  $$DailyContextsTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get date => $composableBuilder(
+    column: $table.date,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get sleepMinutes => $composableBuilder(
+    column: $table.sleepMinutes,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get sleepQuality => $composableBuilder(
+    column: $table.sleepQuality,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get stress => $composableBuilder(
+    column: $table.stress,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get notes => $composableBuilder(
+    column: $table.notes,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get updatedAt => $composableBuilder(
+    column: $table.updatedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $$DailyContextsTableAnnotationComposer
+    extends Composer<_$AppDatabase, $DailyContextsTable> {
+  $$DailyContextsTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<int> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get date =>
+      $composableBuilder(column: $table.date, builder: (column) => column);
+
+  GeneratedColumn<int> get sleepMinutes => $composableBuilder(
+    column: $table.sleepMinutes,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get sleepQuality => $composableBuilder(
+    column: $table.sleepQuality,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get stress =>
+      $composableBuilder(column: $table.stress, builder: (column) => column);
+
+  GeneratedColumn<String> get notes =>
+      $composableBuilder(column: $table.notes, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get createdAt =>
+      $composableBuilder(column: $table.createdAt, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get updatedAt =>
+      $composableBuilder(column: $table.updatedAt, builder: (column) => column);
+}
+
+class $$DailyContextsTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $DailyContextsTable,
+          DailyContext,
+          $$DailyContextsTableFilterComposer,
+          $$DailyContextsTableOrderingComposer,
+          $$DailyContextsTableAnnotationComposer,
+          $$DailyContextsTableCreateCompanionBuilder,
+          $$DailyContextsTableUpdateCompanionBuilder,
+          (
+            DailyContext,
+            BaseReferences<_$AppDatabase, $DailyContextsTable, DailyContext>,
+          ),
+          DailyContext,
+          PrefetchHooks Function()
+        > {
+  $$DailyContextsTableTableManager(_$AppDatabase db, $DailyContextsTable table)
+    : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$DailyContextsTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$DailyContextsTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$DailyContextsTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                Value<DateTime> date = const Value.absent(),
+                Value<int?> sleepMinutes = const Value.absent(),
+                Value<int?> sleepQuality = const Value.absent(),
+                Value<int?> stress = const Value.absent(),
+                Value<String?> notes = const Value.absent(),
+                Value<DateTime> createdAt = const Value.absent(),
+                Value<DateTime> updatedAt = const Value.absent(),
+              }) => DailyContextsCompanion(
+                id: id,
+                date: date,
+                sleepMinutes: sleepMinutes,
+                sleepQuality: sleepQuality,
+                stress: stress,
+                notes: notes,
+                createdAt: createdAt,
+                updatedAt: updatedAt,
+              ),
+          createCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                required DateTime date,
+                Value<int?> sleepMinutes = const Value.absent(),
+                Value<int?> sleepQuality = const Value.absent(),
+                Value<int?> stress = const Value.absent(),
+                Value<String?> notes = const Value.absent(),
+                required DateTime createdAt,
+                required DateTime updatedAt,
+              }) => DailyContextsCompanion.insert(
+                id: id,
+                date: date,
+                sleepMinutes: sleepMinutes,
+                sleepQuality: sleepQuality,
+                stress: stress,
+                notes: notes,
+                createdAt: createdAt,
+                updatedAt: updatedAt,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable<$DailyContextsTable, DailyContext>(table),
+                  BaseReferences<
+                    _$AppDatabase,
+                    $DailyContextsTable,
+                    DailyContext
+                  >(db, table, e),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback: null,
+        ),
+      );
+}
+
+typedef $$DailyContextsTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $DailyContextsTable,
+      DailyContext,
+      $$DailyContextsTableFilterComposer,
+      $$DailyContextsTableOrderingComposer,
+      $$DailyContextsTableAnnotationComposer,
+      $$DailyContextsTableCreateCompanionBuilder,
+      $$DailyContextsTableUpdateCompanionBuilder,
+      (
+        DailyContext,
+        BaseReferences<_$AppDatabase, $DailyContextsTable, DailyContext>,
+      ),
+      DailyContext,
+      PrefetchHooks Function()
     >;
 typedef $$MealFoodsTableCreateCompanionBuilder = MealFoodsCompanion Function({
   Value<int> id,
@@ -8837,6 +9621,8 @@ class $AppDatabaseManager {
       $$MealTemplatesTableTableManager(_db, _db.mealTemplates);
   $$MealTemplateFoodsTableTableManager get mealTemplateFoods =>
       $$MealTemplateFoodsTableTableManager(_db, _db.mealTemplateFoods);
+  $$DailyContextsTableTableManager get dailyContexts =>
+      $$DailyContextsTableTableManager(_db, _db.dailyContexts);
   $$MealFoodsTableTableManager get mealFoods =>
       $$MealFoodsTableTableManager(_db, _db.mealFoods);
   $$SymptomsTableTableManager get symptoms =>

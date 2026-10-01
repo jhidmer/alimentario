@@ -9,6 +9,7 @@ import 'daos/category_dao.dart';
 import 'daos/food_dao.dart';
 import 'daos/meal_dao.dart';
 import 'daos/meal_template_dao.dart';
+import 'daos/daily_context_dao.dart';
 import 'daos/reaction_dao.dart';
 import 'daos/settings_dao.dart';
 import 'daos/statistics_dao.dart';
@@ -19,6 +20,7 @@ import 'tables/meal_foods_table.dart';
 import 'tables/meals_table.dart';
 import 'tables/meal_template_foods_table.dart';
 import 'tables/meal_templates_table.dart';
+import 'tables/daily_contexts_table.dart';
 import 'tables/reaction_photos_table.dart';
 import 'tables/reaction_symptoms_table.dart';
 import 'tables/reactions_table.dart';
@@ -33,6 +35,7 @@ part 'app_database.g.dart';
   Meals,
   MealTemplates,
   MealTemplateFoods,
+  DailyContexts,
   MealFoods,
   Symptoms,
   Reactions,
@@ -45,6 +48,7 @@ part 'app_database.g.dart';
   FoodDao,
   MealDao,
   MealTemplateDao,
+  DailyContextDao,
   ReactionDao,
   StatisticsDao,
   SettingsDao,
@@ -61,7 +65,7 @@ class AppDatabase extends _$AppDatabase {
   }
 
   @override
-  int get schemaVersion => 3;
+  int get schemaVersion => 4;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -75,6 +79,7 @@ class AppDatabase extends _$AppDatabase {
             await m.createTable(mealTemplates);
             await m.createTable(mealTemplateFoods);
           }
+          if (from < 4) await m.createTable(dailyContexts);
         },
         beforeOpen: (details) async {
           await customStatement('PRAGMA foreign_keys = ON');
@@ -103,7 +108,7 @@ class AppDatabase extends _$AppDatabase {
         CategoriesCompanion.insert(name: 'Snacks', isDefault: const Value(true), createdAt: now),
         CategoriesCompanion.insert(name: 'Otros', isDefault: const Value(true), createdAt: now),
       ]);
-      batch.insert(schemaMetadata, SchemaMetadataCompanion.insert(key: 'database_version', value: const Value('3')));
+      batch.insert(schemaMetadata, SchemaMetadataCompanion.insert(key: 'database_version', value: const Value('4')));
       batch.insertAll(symptoms, _defaultSymptoms(now));
     });
     await _ensureDefaultFoods();
@@ -149,10 +154,11 @@ class AppDatabase extends _$AppDatabase {
       await delete(meals).go();
       await delete(mealTemplateFoods).go();
       await delete(mealTemplates).go();
+      await delete(dailyContexts).go();
       await delete(foods).go();
       await delete(appSettings).go();
       await delete(schemaMetadata).go();
-      await into(schemaMetadata).insert(SchemaMetadataCompanion.insert(key: 'database_version', value: const Value('3')));
+      await into(schemaMetadata).insert(SchemaMetadataCompanion.insert(key: 'database_version', value: const Value('4')));
     });
     for (final photo in photos) {
       final file = File(photo.filePath);
