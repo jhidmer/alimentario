@@ -25,6 +25,8 @@ class _MealEntryPageState extends State<MealEntryPage> {
   final _searchController = TextEditingController();
   late Future<List<FoodSummary>> _foods;
   final _selectedIds = <int>{};
+  final _quantityControllers = <int, TextEditingController>{};
+  final _units = <int, String?>{};
   DateTime _mealDateTime = DateTime.now();
   bool _saving = false;
   late Future<List<MealTemplateSummary>> _templates;
@@ -37,6 +39,11 @@ class _MealEntryPageState extends State<MealEntryPage> {
     final meal = widget.initialMeal;
     if (meal != null) {
       _selectedIds.addAll(meal.foodIds);
+      for (final id in meal.foodIds) {
+        final quantity = meal.foodQuantities[id];
+        _quantityControllers[id] = TextEditingController(text: quantity?.toString() ?? '');
+        _units[id] = meal.foodUnits[id];
+      }
       _mealDateTime = meal.mealDatetime;
       _notesController.text = meal.notes ?? '';
     }
@@ -46,7 +53,23 @@ class _MealEntryPageState extends State<MealEntryPage> {
   void dispose() {
     _notesController.dispose();
     _searchController.dispose();
+    for (final controller in _quantityControllers.values) {
+      controller.dispose();
+    }
     super.dispose();
+  }
+
+  void _toggleFood(int id, bool selected) {
+    setState(() {
+      if (selected) {
+        _selectedIds.add(id);
+        _quantityControllers.putIfAbsent(id, () => TextEditingController());
+      } else {
+        _selectedIds.remove(id);
+        _quantityControllers.remove(id)?.dispose();
+        _units.remove(id);
+      }
+    });
   }
 
   void _search(String value) {
@@ -137,6 +160,11 @@ class _MealEntryPageState extends State<MealEntryPage> {
         mealDatetime: _mealDateTime,
         type: widget.type,
         foodIds: _selectedIds.toList(),
+        foodItems: _selectedIds.map((id) => MealFoodDraft(
+              foodId: id,
+              quantity: double.tryParse(_quantityControllers[id]?.text.trim() ?? ''),
+              unit: _units[id],
+            )).toList(),
         notes: _notesController.text,
       );
       if (widget.initialMeal == null) {
@@ -189,15 +217,29 @@ class _MealEntryPageState extends State<MealEntryPage> {
               if (snapshot.hasError) return const Text('No se pudieron cargar los alimentos.');
               final foods = snapshot.data ?? [];
               if (foods.isEmpty) return const Text('Crea un alimento desde Configuración para comenzar.');
-              return Wrap(
-                spacing: 8,
-                runSpacing: 8,
-                children: foods.map((food) => FilterChip(
-                      label: Text(food.name),
-                      selected: _selectedIds.contains(food.id),
-                      onSelected: (selected) => setState(() => selected ? _selectedIds.add(food.id) : _selectedIds.remove(food.id)),
-                    )).toList(),
-              );
+              final names = {for (final food in foods) food.id: food.name};
+              return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                Wrap(
+                  spacing: 8,
+                  runSpacing: 8,
+                  children: foods.map((food) => FilterChip(
+                        label: Text(food.name),
+                        selected: _selectedIds.contains(food.id),
+                        onSelected: (selected) => _toggleFood(food.id, selected),
+                      )).toList(),
+                ),
+                if (_selectedIds.isNotEmpty) ...[
+                  const SizedBox(height: 16),
+                  Text('Cantidad (opcional)', style: Theme.of(context).textTheme.titleSmall),
+                  const SizedBox(height: 8),
+                  ..._selectedIds.map((id) => Row(children: [
+                        Expanded(child: Text(names[id] ?? 'Alimento')),
+                        SizedBox(width: 86, child: TextField(controller: _quantityControllers.putIfAbsent(id, () => TextEditingController()), keyboardType: const TextInputType.numberWithOptions(decimal: true), decoration: const InputDecoration(hintText: 'Cantidad'))),
+                        const SizedBox(width: 8),
+                        SizedBox(width: 112, child: DropdownButtonFormField<String>(isExpanded: true, initialValue: _units[id], decoration: const InputDecoration(hintText: 'Unidad'), items: const ['g', 'kg', 'ml', 'l', 'unidad', 'taza', 'cucharada'].map((unit) => DropdownMenuItem(value: unit, child: Text(unit))).toList(), onChanged: (value) => setState(() => _units[id] = value))),
+                      ])),
+                ],
+              ]);
             },
           ),
           const SizedBox(height: 24),

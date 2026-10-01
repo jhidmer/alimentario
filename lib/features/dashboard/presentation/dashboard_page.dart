@@ -203,7 +203,7 @@ class _MealSection extends StatelessWidget {
           ...meals.map((meal) => ListTile(
                 contentPadding: EdgeInsets.zero,
                 title: Text(_timeLabel(meal.mealDatetime)),
-                subtitle: Text(meal.foodNames.join(' · ')),
+                subtitle: Text(meal.displayFoodNames.join(' · ')),
                 trailing: PopupMenuButton<String>(
                   onSelected: (value) => value == 'edit' ? onEdit(meal) : onDelete(meal),
                   itemBuilder: (_) => const [

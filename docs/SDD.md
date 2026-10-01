@@ -167,7 +167,7 @@ Reglas:
 - Podrá desactivarse sin eliminar comidas históricas.
 - Los cambios posteriores no modificarán comidas ya registradas.
 
-Estado: implementada la persistencia local, selección desde el formulario y guardado de combinaciones habituales.
+Estado: implementada la persistencia local, selección desde el formulario, guardado de combinaciones habituales y cantidad/unidad opcionales por alimento.
 
 ## Mejoras UX Implementadas
 

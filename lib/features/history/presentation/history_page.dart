@@ -265,7 +265,7 @@ class _Timeline extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final entries = <_TimelineEntry>[
-      ...data.meals.map((meal) => _TimelineEntry(time: meal.mealDatetime, icon: Icons.restaurant, title: _mealTypeLabel(meal.type), detail: meal.foodNames.join(' · '), onEdit: () => onEditMeal(meal), onDelete: () => onDeleteMeal(meal))),
+      ...data.meals.map((meal) => _TimelineEntry(time: meal.mealDatetime, icon: Icons.restaurant, title: _mealTypeLabel(meal.type), detail: meal.displayFoodNames.join(' · '), onEdit: () => onEditMeal(meal), onDelete: () => onDeleteMeal(meal))),
       ...data.reactions.map((reaction) => _TimelineEntry(time: reaction.startedAt, icon: Icons.monitor_heart, title: 'Reacción', detail: '${reaction.symptoms.join(' · ')} · ${_intensityLabel(reaction.intensity)}', onEdit: () => onEditReaction(reaction), onDelete: () => onDeleteReaction(reaction))),
     ]..sort((a, b) => a.time.compareTo(b.time));
     if (entries.isEmpty) return const Text('No hay registros para este día.');
