@@ -53,18 +53,19 @@ class _PatternsPageState extends State<PatternsPage> {
           final results = snapshot.data ?? [];
           if (results.isEmpty) return const Text('Registra comidas y reacciones para detectar asociaciones temporales.');
           return Column(children: results.map((result) => Card(child: ExpansionTile(
-                title: Text(result.foodName),
-                subtitle: Text('${result.withReaction} de ${result.total} consumos · ${result.percentage.toStringAsFixed(0)} %'),
+                  title: Text(result.foodName),
+                  subtitle: Text('${result.withReaction} de ${result.total} consumos · ${result.percentage.toStringAsFixed(0)} %\n${result.confidenceLabel}'),
+                  leading: Icon(result.hasMinimumSample ? Icons.insights : Icons.info_outline, color: result.hasMinimumSample ? Theme.of(context).colorScheme.primary : Colors.orange),
                 children: [
                   ListTile(title: const Text('Con reacción posterior'), trailing: Text('${result.withReaction}')),
                   ListTile(title: const Text('Sin reacción posterior'), trailing: Text('${result.withoutReaction}')),
                   ...result.symptoms.entries.map((entry) => ListTile(dense: true, title: Text(entry.key), trailing: Text('${entry.value}'))),
                 ],
-              ))).toList());
+                ))).toList());
         },
       ),
       const SizedBox(height: 20),
-      const Text('La asociación temporal representa coincidencias estadísticas y no demuestra causalidad ni constituye un diagnóstico médico.'),
+      const Text('Los resultados con menos de 5 consumos deben considerarse insuficientes. La asociación temporal representa coincidencias estadísticas y no demuestra causalidad ni constituye un diagnóstico médico.'),
     ]);
   }
 }

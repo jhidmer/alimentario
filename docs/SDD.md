@@ -179,6 +179,17 @@ Cada comida y reacción tendrá una vista de detalle accesible desde Hoy e Histo
 
 Estado: implementada para comidas y reacciones, incluyendo fotografías de reacciones.
 
+### Mejora 05: Confianza Estadística
+
+Los patrones mostrarán siempre el tamaño de muestra y no solo el porcentaje. Se aplicarán estas etiquetas orientativas:
+
+- menos de 5 consumos: `Datos insuficientes`;
+- 5 a 9: `Confianza baja`;
+- 10 a 19: `Confianza moderada`;
+- 20 o más: `Muestra más estable`.
+
+Estas etiquetas no representan una validación médica ni causalidad. Sirven para evitar que el usuario interprete porcentajes pequeños como conclusiones firmes.
+
 ## Mejoras UX Implementadas
 
 - El backup permite seleccionar la carpeta de destino y muestra la ruta generada.

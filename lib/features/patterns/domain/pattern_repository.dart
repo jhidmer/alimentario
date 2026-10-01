@@ -13,6 +13,15 @@ class PatternResult {
   final Map<String, int> symptoms;
 
   double get percentage => total == 0 ? 0 : withReaction * 100 / total;
+
+  String get confidenceLabel {
+    if (total < 5) return 'Datos insuficientes';
+    if (total < 10) return 'Confianza baja';
+    if (total < 20) return 'Confianza moderada';
+    return 'Muestra más estable';
+  }
+
+  bool get hasMinimumSample => total >= 5;
 }
 
 abstract interface class PatternRepository {

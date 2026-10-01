@@ -19,4 +19,13 @@ void main() {
     const window = PatternWindow(hours: 6);
     expect(window.hours, 6);
   });
+
+  test('clasifica la confianza según el tamaño de muestra', () {
+    const low = PatternResult(foodName: 'Pan', total: 3, withReaction: 1, withoutReaction: 2, symptoms: {});
+    const moderate = PatternResult(foodName: 'Arroz', total: 12, withReaction: 4, withoutReaction: 8, symptoms: {});
+    expect(low.confidenceLabel, 'Datos insuficientes');
+    expect(low.hasMinimumSample, isFalse);
+    expect(moderate.confidenceLabel, 'Confianza moderada');
+    expect(moderate.hasMinimumSample, isTrue);
+  });
 }
