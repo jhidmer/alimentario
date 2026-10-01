@@ -169,6 +169,10 @@ Reglas:
 
 Estado: implementada la persistencia local, selección desde el formulario, guardado de combinaciones habituales y cantidad/unidad opcionales por alimento.
 
+### Mejora 03: Recordatorios Locales
+
+El usuario podrá activar un recordatorio diario y seleccionar la hora. Las notificaciones se programarán localmente, sin cuenta, servidor ni conexión a Internet. El permiso podrá rechazarse sin afectar el registro de comidas.
+
 ## Mejoras UX Implementadas
 
 - El backup permite seleccionar la carpeta de destino y muestra la ruta generada.

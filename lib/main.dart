@@ -4,12 +4,15 @@ import 'package:flutter/material.dart';
 
 import 'core/database/database_provider.dart';
 import 'core/navigation/app_shell.dart';
+import 'core/notifications/reminder_service.dart';
 import 'core/theme/app_theme.dart';
 import 'core/theme/theme_controller.dart';
 import 'core/utils/app_logger.dart';
 import 'features/onboarding/presentation/onboarding_page.dart';
 
-void main() {
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await reminderService.initialize();
   FlutterError.onError = (details) {
     AppLogger.error('Error no controlado de Flutter', details.exception, details.stack);
     FlutterError.presentError(details);

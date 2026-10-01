@@ -5,6 +5,7 @@ import 'package:restart_app/restart_app.dart';
 
 import '../../../core/database/database_provider.dart';
 import '../../../core/theme/theme_controller.dart';
+import '../../../core/notifications/reminder_service.dart';
 import '../../foods/presentation/food_catalog_page.dart';
 import '../../backup/data/backup_repository_impl.dart';
 import '../../export/data/export_repository_impl.dart';
@@ -27,6 +28,8 @@ class _SettingsPageState extends State<SettingsPage> {
   late final BackupRepositoryImpl _backups;
   late final ExportRepositoryImpl _exports;
   String _analysisWindow = '6';
+  bool _remindersEnabled = false;
+  TimeOfDayValue _reminderTime = const TimeOfDayValue(hour: 20, minute: 0);
 
   @override
   void initState() {
@@ -39,7 +42,37 @@ class _SettingsPageState extends State<SettingsPage> {
 
   Future<void> _load() async {
     final value = await _settings.get('analysis_window');
-    if (value != null && mounted) setState(() => _analysisWindow = value);
+    final enabled = await _settings.get('reminders_enabled');
+    final hour = int.tryParse(await _settings.get('reminder_hour') ?? '') ?? 20;
+    final minute = int.tryParse(await _settings.get('reminder_minute') ?? '') ?? 0;
+    if (mounted) {
+      setState(() {
+        if (value != null) _analysisWindow = value;
+        _remindersEnabled = enabled == 'true';
+        _reminderTime = TimeOfDayValue(hour: hour, minute: minute);
+      });
+    }
+  }
+
+  Future<void> _toggleReminders(bool enabled) async {
+    if (enabled) await reminderService.requestPermission();
+    setState(() => _remindersEnabled = enabled);
+    await _settings.set('reminders_enabled', '$enabled');
+    if (enabled) {
+      await reminderService.scheduleDaily(_reminderTime);
+    } else {
+      await reminderService.cancelDaily();
+    }
+  }
+
+  Future<void> _pickReminderTime() async {
+    final selected = await showTimePicker(context: context, initialTime: TimeOfDay(hour: _reminderTime.hour, minute: _reminderTime.minute));
+    if (selected == null || !mounted) return;
+    final time = TimeOfDayValue(hour: selected.hour, minute: selected.minute);
+    setState(() => _reminderTime = time);
+    await _settings.set('reminder_hour', '${time.hour}');
+    await _settings.set('reminder_minute', '${time.minute}');
+    if (_remindersEnabled) await reminderService.scheduleDaily(time);
   }
 
   Future<void> _saveWindow(String value) async {
@@ -221,6 +254,15 @@ class _SettingsPageState extends State<SettingsPage> {
               onSelectionChanged: (value) => widget.themeController.setMode(value.first),
             ),
           ),
+          const _SectionTitle('Recordatorios'),
+          SwitchListTile(
+            secondary: const Icon(Icons.notifications_outlined),
+            title: const Text('Recordatorio diario'),
+            subtitle: Text('Registrar comidas a las ${_timeLabel(_reminderTime)}'),
+            value: _remindersEnabled,
+            onChanged: _toggleReminders,
+          ),
+          if (_remindersEnabled) ListTile(leading: const Icon(Icons.schedule), title: const Text('Cambiar hora'), trailing: OutlinedButton(onPressed: _pickReminderTime, child: Text(_timeLabel(_reminderTime)))),
           ListTile(
             leading: const Icon(Icons.tune),
             title: const Text('Ventana predeterminada'),
@@ -282,3 +324,5 @@ class _SectionTitle extends StatelessWidget {
         child: Text(title.toUpperCase(), style: Theme.of(context).textTheme.labelMedium),
       );
 }
+
+String _timeLabel(TimeOfDayValue time) => '${time.hour.toString().padLeft(2, '0')}:${time.minute.toString().padLeft(2, '0')}';
