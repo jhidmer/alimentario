@@ -2535,6 +2535,489 @@ class DailyContextsCompanion extends UpdateCompanion<DailyContext> {
   }
 }
 
+class $DailyMedicationsTable extends DailyMedications
+    with TableInfo<$DailyMedicationsTable, DailyMedication> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $DailyMedicationsTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<int> id = GeneratedColumn<int>(
+    'id',
+    aliasedName,
+    false,
+    hasAutoIncrement: true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'PRIMARY KEY AUTOINCREMENT',
+    ),
+  );
+  static const VerificationMeta _dateMeta = const VerificationMeta('date');
+  @override
+  late final GeneratedColumn<DateTime> date = GeneratedColumn<DateTime>(
+    'date',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _nameMeta = const VerificationMeta('name');
+  @override
+  late final GeneratedColumn<String> name = GeneratedColumn<String>(
+    'name',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _dosageMeta = const VerificationMeta('dosage');
+  @override
+  late final GeneratedColumn<double> dosage = GeneratedColumn<double>(
+    'dosage',
+    aliasedName,
+    true,
+    type: DriftSqlType.double,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _unitMeta = const VerificationMeta('unit');
+  @override
+  late final GeneratedColumn<String> unit = GeneratedColumn<String>(
+    'unit',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _kindMeta = const VerificationMeta('kind');
+  @override
+  late final GeneratedColumn<String> kind = GeneratedColumn<String>(
+    'kind',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _notesMeta = const VerificationMeta('notes');
+  @override
+  late final GeneratedColumn<String> notes = GeneratedColumn<String>(
+    'notes',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _createdAtMeta = const VerificationMeta(
+    'createdAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> createdAt = GeneratedColumn<DateTime>(
+    'created_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: true,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    id,
+    date,
+    name,
+    dosage,
+    unit,
+    kind,
+    notes,
+    createdAt,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'daily_medications';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<DailyMedication> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    }
+    if (data.containsKey('date')) {
+      context.handle(
+        _dateMeta,
+        date.isAcceptableOrUnknown(data['date']!, _dateMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_dateMeta);
+    }
+    if (data.containsKey('name')) {
+      context.handle(
+        _nameMeta,
+        name.isAcceptableOrUnknown(data['name']!, _nameMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_nameMeta);
+    }
+    if (data.containsKey('dosage')) {
+      context.handle(
+        _dosageMeta,
+        dosage.isAcceptableOrUnknown(data['dosage']!, _dosageMeta),
+      );
+    }
+    if (data.containsKey('unit')) {
+      context.handle(
+        _unitMeta,
+        unit.isAcceptableOrUnknown(data['unit']!, _unitMeta),
+      );
+    }
+    if (data.containsKey('kind')) {
+      context.handle(
+        _kindMeta,
+        kind.isAcceptableOrUnknown(data['kind']!, _kindMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_kindMeta);
+    }
+    if (data.containsKey('notes')) {
+      context.handle(
+        _notesMeta,
+        notes.isAcceptableOrUnknown(data['notes']!, _notesMeta),
+      );
+    }
+    if (data.containsKey('created_at')) {
+      context.handle(
+        _createdAtMeta,
+        createdAt.isAcceptableOrUnknown(data['created_at']!, _createdAtMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_createdAtMeta);
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  DailyMedication map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return DailyMedication(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}id'],
+      )!,
+      date: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}date'],
+      )!,
+      name: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}name'],
+      )!,
+      dosage: attachedDatabase.typeMapping.read(
+        DriftSqlType.double,
+        data['${effectivePrefix}dosage'],
+      ),
+      unit: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}unit'],
+      ),
+      kind: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}kind'],
+      )!,
+      notes: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}notes'],
+      ),
+      createdAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}created_at'],
+      )!,
+    );
+  }
+
+  @override
+  $DailyMedicationsTable createAlias(String alias) {
+    return $DailyMedicationsTable(attachedDatabase, alias);
+  }
+}
+
+class DailyMedication extends DataClass implements Insertable<DailyMedication> {
+  final int id;
+  final DateTime date;
+  final String name;
+  final double? dosage;
+  final String? unit;
+  final String kind;
+  final String? notes;
+  final DateTime createdAt;
+  const DailyMedication({
+    required this.id,
+    required this.date,
+    required this.name,
+    this.dosage,
+    this.unit,
+    required this.kind,
+    this.notes,
+    required this.createdAt,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<int>(id);
+    map['date'] = Variable<DateTime>(date);
+    map['name'] = Variable<String>(name);
+    if (!nullToAbsent || dosage != null) {
+      map['dosage'] = Variable<double>(dosage);
+    }
+    if (!nullToAbsent || unit != null) {
+      map['unit'] = Variable<String>(unit);
+    }
+    map['kind'] = Variable<String>(kind);
+    if (!nullToAbsent || notes != null) {
+      map['notes'] = Variable<String>(notes);
+    }
+    map['created_at'] = Variable<DateTime>(createdAt);
+    return map;
+  }
+
+  DailyMedicationsCompanion toCompanion(bool nullToAbsent) {
+    return DailyMedicationsCompanion(
+      id: Value(id),
+      date: Value(date),
+      name: Value(name),
+      dosage: dosage == null && nullToAbsent
+          ? const Value.absent()
+          : Value(dosage),
+      unit: unit == null && nullToAbsent ? const Value.absent() : Value(unit),
+      kind: Value(kind),
+      notes: notes == null && nullToAbsent
+          ? const Value.absent()
+          : Value(notes),
+      createdAt: Value(createdAt),
+    );
+  }
+
+  factory DailyMedication.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return DailyMedication(
+      id: serializer.fromJson<int>(json['id']),
+      date: serializer.fromJson<DateTime>(json['date']),
+      name: serializer.fromJson<String>(json['name']),
+      dosage: serializer.fromJson<double?>(json['dosage']),
+      unit: serializer.fromJson<String?>(json['unit']),
+      kind: serializer.fromJson<String>(json['kind']),
+      notes: serializer.fromJson<String?>(json['notes']),
+      createdAt: serializer.fromJson<DateTime>(json['createdAt']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<int>(id),
+      'date': serializer.toJson<DateTime>(date),
+      'name': serializer.toJson<String>(name),
+      'dosage': serializer.toJson<double?>(dosage),
+      'unit': serializer.toJson<String?>(unit),
+      'kind': serializer.toJson<String>(kind),
+      'notes': serializer.toJson<String?>(notes),
+      'createdAt': serializer.toJson<DateTime>(createdAt),
+    };
+  }
+
+  DailyMedication copyWith({
+    int? id,
+    DateTime? date,
+    String? name,
+    Value<double?> dosage = const Value.absent(),
+    Value<String?> unit = const Value.absent(),
+    String? kind,
+    Value<String?> notes = const Value.absent(),
+    DateTime? createdAt,
+  }) => DailyMedication(
+    id: id ?? this.id,
+    date: date ?? this.date,
+    name: name ?? this.name,
+    dosage: dosage.present ? dosage.value : this.dosage,
+    unit: unit.present ? unit.value : this.unit,
+    kind: kind ?? this.kind,
+    notes: notes.present ? notes.value : this.notes,
+    createdAt: createdAt ?? this.createdAt,
+  );
+  DailyMedication copyWithCompanion(DailyMedicationsCompanion data) {
+    return DailyMedication(
+      id: data.id.present ? data.id.value : this.id,
+      date: data.date.present ? data.date.value : this.date,
+      name: data.name.present ? data.name.value : this.name,
+      dosage: data.dosage.present ? data.dosage.value : this.dosage,
+      unit: data.unit.present ? data.unit.value : this.unit,
+      kind: data.kind.present ? data.kind.value : this.kind,
+      notes: data.notes.present ? data.notes.value : this.notes,
+      createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('DailyMedication(')
+          ..write('id: $id, ')
+          ..write('date: $date, ')
+          ..write('name: $name, ')
+          ..write('dosage: $dosage, ')
+          ..write('unit: $unit, ')
+          ..write('kind: $kind, ')
+          ..write('notes: $notes, ')
+          ..write('createdAt: $createdAt')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode =>
+      Object.hash(id, date, name, dosage, unit, kind, notes, createdAt);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is DailyMedication &&
+          other.id == this.id &&
+          other.date == this.date &&
+          other.name == this.name &&
+          other.dosage == this.dosage &&
+          other.unit == this.unit &&
+          other.kind == this.kind &&
+          other.notes == this.notes &&
+          other.createdAt == this.createdAt);
+}
+
+class DailyMedicationsCompanion extends UpdateCompanion<DailyMedication> {
+  final Value<int> id;
+  final Value<DateTime> date;
+  final Value<String> name;
+  final Value<double?> dosage;
+  final Value<String?> unit;
+  final Value<String> kind;
+  final Value<String?> notes;
+  final Value<DateTime> createdAt;
+  const DailyMedicationsCompanion({
+    this.id = const Value.absent(),
+    this.date = const Value.absent(),
+    this.name = const Value.absent(),
+    this.dosage = const Value.absent(),
+    this.unit = const Value.absent(),
+    this.kind = const Value.absent(),
+    this.notes = const Value.absent(),
+    this.createdAt = const Value.absent(),
+  });
+  DailyMedicationsCompanion.insert({
+    this.id = const Value.absent(),
+    required DateTime date,
+    required String name,
+    this.dosage = const Value.absent(),
+    this.unit = const Value.absent(),
+    required String kind,
+    this.notes = const Value.absent(),
+    required DateTime createdAt,
+  }) : date = Value(date),
+       name = Value(name),
+       kind = Value(kind),
+       createdAt = Value(createdAt);
+  static Insertable<DailyMedication> custom({
+    Expression<int>? id,
+    Expression<DateTime>? date,
+    Expression<String>? name,
+    Expression<double>? dosage,
+    Expression<String>? unit,
+    Expression<String>? kind,
+    Expression<String>? notes,
+    Expression<DateTime>? createdAt,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (date != null) 'date': date,
+      if (name != null) 'name': name,
+      if (dosage != null) 'dosage': dosage,
+      if (unit != null) 'unit': unit,
+      if (kind != null) 'kind': kind,
+      if (notes != null) 'notes': notes,
+      if (createdAt != null) 'created_at': createdAt,
+    });
+  }
+
+  DailyMedicationsCompanion copyWith({
+    Value<int>? id,
+    Value<DateTime>? date,
+    Value<String>? name,
+    Value<double?>? dosage,
+    Value<String?>? unit,
+    Value<String>? kind,
+    Value<String?>? notes,
+    Value<DateTime>? createdAt,
+  }) {
+    return DailyMedicationsCompanion(
+      id: id ?? this.id,
+      date: date ?? this.date,
+      name: name ?? this.name,
+      dosage: dosage ?? this.dosage,
+      unit: unit ?? this.unit,
+      kind: kind ?? this.kind,
+      notes: notes ?? this.notes,
+      createdAt: createdAt ?? this.createdAt,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<int>(id.value);
+    }
+    if (date.present) {
+      map['date'] = Variable<DateTime>(date.value);
+    }
+    if (name.present) {
+      map['name'] = Variable<String>(name.value);
+    }
+    if (dosage.present) {
+      map['dosage'] = Variable<double>(dosage.value);
+    }
+    if (unit.present) {
+      map['unit'] = Variable<String>(unit.value);
+    }
+    if (kind.present) {
+      map['kind'] = Variable<String>(kind.value);
+    }
+    if (notes.present) {
+      map['notes'] = Variable<String>(notes.value);
+    }
+    if (createdAt.present) {
+      map['created_at'] = Variable<DateTime>(createdAt.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('DailyMedicationsCompanion(')
+          ..write('id: $id, ')
+          ..write('date: $date, ')
+          ..write('name: $name, ')
+          ..write('dosage: $dosage, ')
+          ..write('unit: $unit, ')
+          ..write('kind: $kind, ')
+          ..write('notes: $notes, ')
+          ..write('createdAt: $createdAt')
+          ..write(')'))
+        .toString();
+  }
+}
+
 class $MealFoodsTable extends MealFoods
     with TableInfo<$MealFoodsTable, MealFood> {
   @override
@@ -5098,6 +5581,9 @@ abstract class _$AppDatabase extends GeneratedDatabase {
   late final $MealTemplateFoodsTable mealTemplateFoods =
       $MealTemplateFoodsTable(this);
   late final $DailyContextsTable dailyContexts = $DailyContextsTable(this);
+  late final $DailyMedicationsTable dailyMedications = $DailyMedicationsTable(
+    this,
+  );
   late final $MealFoodsTable mealFoods = $MealFoodsTable(this);
   late final $SymptomsTable symptoms = $SymptomsTable(this);
   late final $ReactionsTable reactions = $ReactionsTable(this);
@@ -5134,6 +5620,10 @@ abstract class _$AppDatabase extends GeneratedDatabase {
   late final Index uqDailyContextsDate = Index(
     'uq_daily_contexts_date',
     'CREATE UNIQUE INDEX uq_daily_contexts_date ON daily_contexts (date)',
+  );
+  late final Index idxDailyMedicationsDate = Index(
+    'idx_daily_medications_date',
+    'CREATE INDEX idx_daily_medications_date ON daily_medications (date)',
   );
   late final Index idxMealFoodsMealId = Index(
     'idx_meal_foods_meal_id',
@@ -5176,6 +5666,9 @@ abstract class _$AppDatabase extends GeneratedDatabase {
   late final DailyContextDao dailyContextDao = DailyContextDao(
     this as AppDatabase,
   );
+  late final DailyMedicationDao dailyMedicationDao = DailyMedicationDao(
+    this as AppDatabase,
+  );
   late final ReactionDao reactionDao = ReactionDao(this as AppDatabase);
   late final StatisticsDao statisticsDao = StatisticsDao(this as AppDatabase);
   late final SettingsDao settingsDao = SettingsDao(this as AppDatabase);
@@ -5191,6 +5684,7 @@ abstract class _$AppDatabase extends GeneratedDatabase {
     mealTemplates,
     mealTemplateFoods,
     dailyContexts,
+    dailyMedications,
     mealFoods,
     symptoms,
     reactions,
@@ -5205,6 +5699,7 @@ abstract class _$AppDatabase extends GeneratedDatabase {
     idxMealsMealType,
     uqMealTemplateFoodsTemplateFood,
     uqDailyContextsDate,
+    idxDailyMedicationsDate,
     idxMealFoodsMealId,
     idxMealFoodsFoodId,
     uqMealFoodsMealFood,
@@ -7365,6 +7860,272 @@ typedef $$DailyContextsTableProcessedTableManager =
         BaseReferences<_$AppDatabase, $DailyContextsTable, DailyContext>,
       ),
       DailyContext,
+      PrefetchHooks Function()
+    >;
+typedef $$DailyMedicationsTableCreateCompanionBuilder =
+    DailyMedicationsCompanion Function({
+      Value<int> id,
+      required DateTime date,
+      required String name,
+      Value<double?> dosage,
+      Value<String?> unit,
+      required String kind,
+      Value<String?> notes,
+      required DateTime createdAt,
+    });
+typedef $$DailyMedicationsTableUpdateCompanionBuilder =
+    DailyMedicationsCompanion Function({
+      Value<int> id,
+      Value<DateTime> date,
+      Value<String> name,
+      Value<double?> dosage,
+      Value<String?> unit,
+      Value<String> kind,
+      Value<String?> notes,
+      Value<DateTime> createdAt,
+    });
+
+class $$DailyMedicationsTableFilterComposer
+    extends Composer<_$AppDatabase, $DailyMedicationsTable> {
+  $$DailyMedicationsTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get date => $composableBuilder(
+    column: $table.date,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get name => $composableBuilder(
+    column: $table.name,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<double> get dosage => $composableBuilder(
+    column: $table.dosage,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get unit => $composableBuilder(
+    column: $table.unit,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get kind => $composableBuilder(
+    column: $table.kind,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get notes => $composableBuilder(
+    column: $table.notes,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnFilters(column),
+  );
+}
+
+class $$DailyMedicationsTableOrderingComposer
+    extends Composer<_$AppDatabase, $DailyMedicationsTable> {
+  $$DailyMedicationsTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get date => $composableBuilder(
+    column: $table.date,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get name => $composableBuilder(
+    column: $table.name,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<double> get dosage => $composableBuilder(
+    column: $table.dosage,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get unit => $composableBuilder(
+    column: $table.unit,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get kind => $composableBuilder(
+    column: $table.kind,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get notes => $composableBuilder(
+    column: $table.notes,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $$DailyMedicationsTableAnnotationComposer
+    extends Composer<_$AppDatabase, $DailyMedicationsTable> {
+  $$DailyMedicationsTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<int> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get date =>
+      $composableBuilder(column: $table.date, builder: (column) => column);
+
+  GeneratedColumn<String> get name =>
+      $composableBuilder(column: $table.name, builder: (column) => column);
+
+  GeneratedColumn<double> get dosage =>
+      $composableBuilder(column: $table.dosage, builder: (column) => column);
+
+  GeneratedColumn<String> get unit =>
+      $composableBuilder(column: $table.unit, builder: (column) => column);
+
+  GeneratedColumn<String> get kind =>
+      $composableBuilder(column: $table.kind, builder: (column) => column);
+
+  GeneratedColumn<String> get notes =>
+      $composableBuilder(column: $table.notes, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get createdAt =>
+      $composableBuilder(column: $table.createdAt, builder: (column) => column);
+}
+
+class $$DailyMedicationsTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $DailyMedicationsTable,
+          DailyMedication,
+          $$DailyMedicationsTableFilterComposer,
+          $$DailyMedicationsTableOrderingComposer,
+          $$DailyMedicationsTableAnnotationComposer,
+          $$DailyMedicationsTableCreateCompanionBuilder,
+          $$DailyMedicationsTableUpdateCompanionBuilder,
+          (
+            DailyMedication,
+            BaseReferences<
+              _$AppDatabase,
+              $DailyMedicationsTable,
+              DailyMedication
+            >,
+          ),
+          DailyMedication,
+          PrefetchHooks Function()
+        > {
+  $$DailyMedicationsTableTableManager(
+    _$AppDatabase db,
+    $DailyMedicationsTable table,
+  ) : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$DailyMedicationsTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$DailyMedicationsTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$DailyMedicationsTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                Value<DateTime> date = const Value.absent(),
+                Value<String> name = const Value.absent(),
+                Value<double?> dosage = const Value.absent(),
+                Value<String?> unit = const Value.absent(),
+                Value<String> kind = const Value.absent(),
+                Value<String?> notes = const Value.absent(),
+                Value<DateTime> createdAt = const Value.absent(),
+              }) => DailyMedicationsCompanion(
+                id: id,
+                date: date,
+                name: name,
+                dosage: dosage,
+                unit: unit,
+                kind: kind,
+                notes: notes,
+                createdAt: createdAt,
+              ),
+          createCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                required DateTime date,
+                required String name,
+                Value<double?> dosage = const Value.absent(),
+                Value<String?> unit = const Value.absent(),
+                required String kind,
+                Value<String?> notes = const Value.absent(),
+                required DateTime createdAt,
+              }) => DailyMedicationsCompanion.insert(
+                id: id,
+                date: date,
+                name: name,
+                dosage: dosage,
+                unit: unit,
+                kind: kind,
+                notes: notes,
+                createdAt: createdAt,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable<$DailyMedicationsTable, DailyMedication>(table),
+                  BaseReferences<
+                    _$AppDatabase,
+                    $DailyMedicationsTable,
+                    DailyMedication
+                  >(db, table, e),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback: null,
+        ),
+      );
+}
+
+typedef $$DailyMedicationsTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $DailyMedicationsTable,
+      DailyMedication,
+      $$DailyMedicationsTableFilterComposer,
+      $$DailyMedicationsTableOrderingComposer,
+      $$DailyMedicationsTableAnnotationComposer,
+      $$DailyMedicationsTableCreateCompanionBuilder,
+      $$DailyMedicationsTableUpdateCompanionBuilder,
+      (
+        DailyMedication,
+        BaseReferences<_$AppDatabase, $DailyMedicationsTable, DailyMedication>,
+      ),
+      DailyMedication,
       PrefetchHooks Function()
     >;
 typedef $$MealFoodsTableCreateCompanionBuilder = MealFoodsCompanion Function({
@@ -9623,6 +10384,8 @@ class $AppDatabaseManager {
       $$MealTemplateFoodsTableTableManager(_db, _db.mealTemplateFoods);
   $$DailyContextsTableTableManager get dailyContexts =>
       $$DailyContextsTableTableManager(_db, _db.dailyContexts);
+  $$DailyMedicationsTableTableManager get dailyMedications =>
+      $$DailyMedicationsTableTableManager(_db, _db.dailyMedications);
   $$MealFoodsTableTableManager get mealFoods =>
       $$MealFoodsTableTableManager(_db, _db.mealFoods);
   $$SymptomsTableTableManager get symptoms =>

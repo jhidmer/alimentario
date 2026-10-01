@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 
 import '../domain/context_repository.dart';
+import '../domain/medication_repository.dart';
 
 class ContextEntryPage extends StatefulWidget {
-  const ContextEntryPage({required this.repository, required this.date, this.initial, super.key});
+  const ContextEntryPage({required this.repository, required this.medicationRepository, required this.date, this.initial, super.key});
   final ContextRepository repository;
+  final MedicationRepository medicationRepository;
   final DateTime date;
   final DailyContextSummary? initial;
 
@@ -17,6 +19,7 @@ class _ContextEntryPageState extends State<ContextEntryPage> {
   final _notesController = TextEditingController();
   int? _sleepQuality;
   int? _stress;
+  late Future<List<DailyMedicationSummary>> _medications;
 
   @override
   void initState() {
@@ -26,6 +29,7 @@ class _ContextEntryPageState extends State<ContextEntryPage> {
     _sleepQuality = initial?.sleepQuality;
     _stress = initial?.stress;
     _notesController.text = initial?.notes ?? '';
+    _medications = widget.medicationRepository.forDay(widget.date);
   }
 
   @override
@@ -38,6 +42,33 @@ class _ContextEntryPageState extends State<ContextEntryPage> {
   Future<void> _save() async {
     await widget.repository.save(DailyContextDraft(date: widget.date, sleepMinutes: int.tryParse(_sleepController.text), sleepQuality: _sleepQuality, stress: _stress, notes: _notesController.text));
     if (mounted) Navigator.pop(context, true);
+  }
+
+  Future<void> _addMedication() async {
+    final name = TextEditingController();
+    final dosage = TextEditingController();
+    final unit = TextEditingController();
+    var kind = 'medication';
+    final saved = await showDialog<bool>(context: context, builder: (context) => StatefulBuilder(builder: (context, setDialogState) => AlertDialog(
+          title: const Text('Agregar tratamiento'),
+          content: Column(mainAxisSize: MainAxisSize.min, children: [
+            TextField(controller: name, autofocus: true, decoration: const InputDecoration(labelText: 'Nombre')),
+            const SizedBox(height: 8),
+            DropdownButtonFormField<String>(initialValue: kind, decoration: const InputDecoration(labelText: 'Tipo'), items: const [DropdownMenuItem(value: 'medication', child: Text('Medicamento')), DropdownMenuItem(value: 'supplement', child: Text('Suplemento'))], onChanged: (value) => setDialogState(() => kind = value ?? kind)),
+            const SizedBox(height: 8),
+            Row(children: [Expanded(child: TextField(controller: dosage, keyboardType: TextInputType.number, decoration: const InputDecoration(labelText: 'Dosis'))), const SizedBox(width: 8), Expanded(child: TextField(controller: unit, decoration: const InputDecoration(labelText: 'Unidad')))]),
+          ]),
+          actions: [TextButton(onPressed: () => Navigator.pop(context, false), child: const Text('Cancelar')), FilledButton(onPressed: () async { await widget.medicationRepository.add(widget.date, name.text, kind, double.tryParse(dosage.text), unit.text, null); if (context.mounted) Navigator.pop(context, true); }, child: const Text('Guardar'))],
+        )));
+    name.dispose();
+    dosage.dispose();
+    unit.dispose();
+    if (saved == true && mounted) setState(() => _medications = widget.medicationRepository.forDay(widget.date));
+  }
+
+  Future<void> _deleteMedication(DailyMedicationSummary item) async {
+    await widget.medicationRepository.delete(item.id);
+    if (mounted) setState(() => _medications = widget.medicationRepository.forDay(widget.date));
   }
 
   @override
@@ -54,7 +85,24 @@ class _ContextEntryPageState extends State<ContextEntryPage> {
           const SizedBox(height: 18),
           Text('Estrés', style: Theme.of(context).textTheme.titleMedium),
           const SizedBox(height: 8),
-          SegmentedButton<int>(segments: const [ButtonSegment(value: 1, label: Text('Bajo')), ButtonSegment(value: 2, label: Text('Medio')), ButtonSegment(value: 3, label: Text('Alto'))], selected: _stress == null ? {} : {_stress!}, onSelectionChanged: (value) => setState(() => _stress = value.first)),
+           SegmentedButton<int>(segments: const [ButtonSegment(value: 1, label: Text('Bajo')), ButtonSegment(value: 2, label: Text('Medio')), ButtonSegment(value: 3, label: Text('Alto'))], selected: _stress == null ? {} : {_stress!}, onSelectionChanged: (value) => setState(() => _stress = value.first)),
+           const SizedBox(height: 18),
+          Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [Text('Medicamentos y suplementos', style: Theme.of(context).textTheme.titleMedium), IconButton(onPressed: _addMedication, tooltip: 'Agregar', icon: const Icon(Icons.add))]),
+          FutureBuilder<List<DailyMedicationSummary>>(
+            future: _medications,
+            builder: (context, snapshot) {
+              if (!snapshot.hasData) return const LinearProgressIndicator();
+              return Column(
+                children: snapshot.data!.map((item) => ListTile(
+                  contentPadding: EdgeInsets.zero,
+                  leading: Icon(item.kind == 'supplement' ? Icons.eco_outlined : Icons.medication_outlined),
+                  title: Text(item.name),
+                  subtitle: Text(item.dosage == null ? (item.kind == 'supplement' ? 'Suplemento' : 'Medicamento') : '${item.dosage} ${item.unit ?? ''}'),
+                  trailing: IconButton(onPressed: () => _deleteMedication(item), tooltip: 'Eliminar', icon: const Icon(Icons.delete_outline)),
+                )).toList(),
+              );
+            },
+          ),
           const SizedBox(height: 18),
           TextField(controller: _notesController, maxLines: 3, decoration: const InputDecoration(labelText: 'Notas (opcional)')),
           const SizedBox(height: 28),

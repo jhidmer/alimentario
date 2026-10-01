@@ -185,6 +185,12 @@ El usuario podrá registrar opcionalmente minutos dormidos, calidad del sueño, 
 
 Estado: persistencia local y registro diario implementados desde Hoy.
 
+### Mejora 08: Medicamentos Y Suplementos
+
+El contexto diario permite registrar medicamentos y suplementos con nombre, dosis, unidad y notas opcionales. Estos registros son locales y descriptivos; la aplicación no recomienda dosis ni tratamientos.
+
+Estado: implementado el registro y eliminación diaria; la integración con estadísticas queda para una etapa posterior.
+
 ### Mejora 05: Confianza Estadística
 
 Los patrones mostrarán siempre el tamaño de muestra y no solo el porcentaje. Se aplicarán estas etiquetas orientativas:
