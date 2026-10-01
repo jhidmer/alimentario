@@ -8,6 +8,7 @@ import 'package:path_provider/path_provider.dart';
 import 'daos/category_dao.dart';
 import 'daos/food_dao.dart';
 import 'daos/meal_dao.dart';
+import 'daos/meal_template_dao.dart';
 import 'daos/reaction_dao.dart';
 import 'daos/settings_dao.dart';
 import 'daos/statistics_dao.dart';
@@ -16,6 +17,8 @@ import 'tables/categories_table.dart';
 import 'tables/foods_table.dart';
 import 'tables/meal_foods_table.dart';
 import 'tables/meals_table.dart';
+import 'tables/meal_template_foods_table.dart';
+import 'tables/meal_templates_table.dart';
 import 'tables/reaction_photos_table.dart';
 import 'tables/reaction_symptoms_table.dart';
 import 'tables/reactions_table.dart';
@@ -28,6 +31,8 @@ part 'app_database.g.dart';
   Categories,
   Foods,
   Meals,
+  MealTemplates,
+  MealTemplateFoods,
   MealFoods,
   Symptoms,
   Reactions,
@@ -39,6 +44,7 @@ part 'app_database.g.dart';
   CategoryDao,
   FoodDao,
   MealDao,
+  MealTemplateDao,
   ReactionDao,
   StatisticsDao,
   SettingsDao,
@@ -55,7 +61,7 @@ class AppDatabase extends _$AppDatabase {
   }
 
   @override
-  int get schemaVersion => 2;
+  int get schemaVersion => 3;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -65,6 +71,10 @@ class AppDatabase extends _$AppDatabase {
         },
         onUpgrade: (Migrator m, int from, int to) async {
           if (from < 2) await m.addColumn(categories, categories.isActive);
+          if (from < 3) {
+            await m.createTable(mealTemplates);
+            await m.createTable(mealTemplateFoods);
+          }
         },
         beforeOpen: (details) async {
           await customStatement('PRAGMA foreign_keys = ON');
@@ -93,7 +103,7 @@ class AppDatabase extends _$AppDatabase {
         CategoriesCompanion.insert(name: 'Snacks', isDefault: const Value(true), createdAt: now),
         CategoriesCompanion.insert(name: 'Otros', isDefault: const Value(true), createdAt: now),
       ]);
-      batch.insert(schemaMetadata, SchemaMetadataCompanion.insert(key: 'database_version', value: const Value('2')));
+      batch.insert(schemaMetadata, SchemaMetadataCompanion.insert(key: 'database_version', value: const Value('3')));
       batch.insertAll(symptoms, _defaultSymptoms(now));
     });
     await _ensureDefaultFoods();
@@ -137,10 +147,12 @@ class AppDatabase extends _$AppDatabase {
       await delete(reactions).go();
       await delete(mealFoods).go();
       await delete(meals).go();
+      await delete(mealTemplateFoods).go();
+      await delete(mealTemplates).go();
       await delete(foods).go();
       await delete(appSettings).go();
       await delete(schemaMetadata).go();
-      await into(schemaMetadata).insert(SchemaMetadataCompanion.insert(key: 'database_version', value: const Value('2')));
+      await into(schemaMetadata).insert(SchemaMetadataCompanion.insert(key: 'database_version', value: const Value('3')));
     });
     for (final photo in photos) {
       final file = File(photo.filePath);

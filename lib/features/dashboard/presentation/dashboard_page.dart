@@ -7,6 +7,7 @@ import '../../foods/data/category_repository.dart';
 import '../../meals/data/meal_repository_impl.dart';
 import '../../meals/domain/meal_repository.dart';
 import '../../meals/presentation/meal_entry_page.dart';
+import '../../meals/data/meal_template_repository_impl.dart';
 import '../../reactions/data/reaction_repository_impl.dart';
 import '../../reactions/domain/reaction_repository.dart';
 import '../../reactions/presentation/reaction_entry_page.dart';
@@ -23,6 +24,7 @@ class _DashboardPageState extends State<DashboardPage> {
   late final FoodRepositoryImpl _foods;
   late final CategoryRepository _categories;
   late final ReactionRepositoryImpl _reactions;
+  late final MealTemplateRepositoryImpl _templates;
   late Future<List<MealSummary>> _today;
   late Future<List<ReactionSummary>> _todayReactions;
 
@@ -33,6 +35,7 @@ class _DashboardPageState extends State<DashboardPage> {
     _foods = FoodRepositoryImpl(appDatabase);
     _categories = CategoryRepositoryImpl(appDatabase);
     _reactions = ReactionRepositoryImpl(appDatabase);
+    _templates = MealTemplateRepositoryImpl(appDatabase);
     _load();
   }
 
@@ -71,14 +74,14 @@ class _DashboardPageState extends State<DashboardPage> {
 
   Future<void> _openMeal(MealType type) async {
     final saved = await Navigator.of(context).push<bool>(MaterialPageRoute(
-      builder: (_) => MealEntryPage(type: type, foodRepository: _foods, categoryRepository: _categories, mealRepository: _meals),
+      builder: (_) => MealEntryPage(type: type, foodRepository: _foods, categoryRepository: _categories, mealRepository: _meals, templateRepository: _templates),
     ));
     if (saved == true && mounted) setState(_load);
   }
 
   Future<void> _editMeal(MealSummary meal) async {
     final saved = await Navigator.of(context).push<bool>(MaterialPageRoute(
-      builder: (_) => MealEntryPage(type: meal.type, initialMeal: meal, foodRepository: _foods, categoryRepository: _categories, mealRepository: _meals),
+      builder: (_) => MealEntryPage(type: meal.type, initialMeal: meal, foodRepository: _foods, categoryRepository: _categories, mealRepository: _meals, templateRepository: _templates),
     ));
     if (saved == true && mounted) setState(_load);
   }

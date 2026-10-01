@@ -3,15 +3,17 @@ import 'package:flutter/material.dart';
 import '../../foods/domain/food_repository.dart';
 import '../../foods/data/category_repository.dart';
 import '../data/meal_repository_impl.dart';
+import '../data/meal_template_repository_impl.dart';
 import '../domain/meal_repository.dart';
 
 class MealEntryPage extends StatefulWidget {
-  const MealEntryPage({required this.type, required this.foodRepository, required this.categoryRepository, required this.mealRepository, this.initialMeal, super.key});
+  const MealEntryPage({required this.type, required this.foodRepository, required this.categoryRepository, required this.mealRepository, required this.templateRepository, this.initialMeal, super.key});
 
   final MealType type;
   final FoodRepository foodRepository;
   final CategoryRepository categoryRepository;
   final MealRepository mealRepository;
+  final MealTemplateRepository templateRepository;
   final MealSummary? initialMeal;
 
   @override
@@ -25,11 +27,13 @@ class _MealEntryPageState extends State<MealEntryPage> {
   final _selectedIds = <int>{};
   DateTime _mealDateTime = DateTime.now();
   bool _saving = false;
+  late Future<List<MealTemplateSummary>> _templates;
 
   @override
   void initState() {
     super.initState();
     _foods = widget.foodRepository.frequent();
+    _templates = widget.templateRepository.findActive();
     final meal = widget.initialMeal;
     if (meal != null) {
       _selectedIds.addAll(meal.foodIds);
@@ -49,6 +53,46 @@ class _MealEntryPageState extends State<MealEntryPage> {
     setState(() {
       _foods = value.trim().isEmpty ? widget.foodRepository.frequent() : widget.foodRepository.search(value);
     });
+  }
+
+  Future<void> _chooseTemplate() async {
+    final templates = await _templates;
+    if (!mounted) return;
+    final template = await showModalBottomSheet<MealTemplateSummary>(
+      context: context,
+      showDragHandle: true,
+      builder: (context) => SafeArea(child: templates.isEmpty
+          ? const Padding(padding: EdgeInsets.all(24), child: Text('Aún no hay comidas habituales.'))
+          : Column(mainAxisSize: MainAxisSize.min, children: templates.map((item) => ListTile(
+                leading: const Icon(Icons.bookmark_outline),
+                title: Text(item.name),
+                subtitle: Text(item.foodNames.join(' · ')),
+                onTap: () => Navigator.pop(context, item),
+              )).toList())),
+    );
+    if (template != null && mounted) setState(() => _selectedIds.addAll(template.foodIds));
+  }
+
+  Future<void> _saveAsTemplate() async {
+    if (_selectedIds.isEmpty) return;
+    final controller = TextEditingController();
+    final name = await showDialog<String>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Guardar comida habitual'),
+        content: TextField(controller: controller, autofocus: true, decoration: const InputDecoration(labelText: 'Nombre')),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(context), child: const Text('Cancelar')),
+          FilledButton(onPressed: () => Navigator.pop(context, controller.text), child: const Text('Guardar')),
+        ],
+      ),
+    );
+    controller.dispose();
+    if (name == null || name.trim().isEmpty || !mounted) return;
+    await widget.templateRepository.create(name, widget.type, _selectedIds.toList());
+    if (!mounted) return;
+    setState(() => _templates = widget.templateRepository.findActive());
+    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Comida habitual guardada.')));
   }
 
   Future<void> _quickAddFood() async {
@@ -129,6 +173,8 @@ class _MealEntryPageState extends State<MealEntryPage> {
             decoration: const InputDecoration(prefixIcon: Icon(Icons.search), hintText: 'Buscar alimento...'),
           ),
           const SizedBox(height: 8),
+          OutlinedButton.icon(onPressed: _chooseTemplate, icon: const Icon(Icons.bookmark_outline), label: const Text('Usar comida habitual')),
+          const SizedBox(height: 8),
           Align(
             alignment: Alignment.centerLeft,
             child: TextButton.icon(onPressed: _quickAddFood, icon: const Icon(Icons.add), label: const Text('Agregar alimento nuevo')),
@@ -160,6 +206,8 @@ class _MealEntryPageState extends State<MealEntryPage> {
             maxLines: 3,
             decoration: const InputDecoration(labelText: 'Observaciones (opcional)'),
           ),
+          const SizedBox(height: 12),
+          if (_selectedIds.isNotEmpty) Align(alignment: Alignment.centerLeft, child: TextButton.icon(onPressed: _saveAsTemplate, icon: const Icon(Icons.bookmark_add_outlined), label: const Text('Guardar como habitual'))),
           const SizedBox(height: 28),
           FilledButton.icon(
             onPressed: _saving ? null : _save,

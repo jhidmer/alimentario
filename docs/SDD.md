@@ -135,6 +135,40 @@ La revisión de mySymptoms Food Diary y Bearable muestra patrones de UX que pued
 
 Estas referencias no implican copiar funcionalidades, diseño ni contenido de terceros. Se utilizarán únicamente como criterios de mejora de experiencia.
 
+## Hoja De Ruta De Mejoras
+
+Las siguientes mejoras se implementarán en este orden, siempre manteniendo funcionamiento offline y almacenamiento local:
+
+1. Comidas habituales reutilizables.
+2. Cantidad y unidad por alimento.
+3. Recordatorios locales.
+4. Pantalla de detalle completa.
+5. Confianza estadística y cantidad mínima de registros.
+6. Gráficos de tendencias.
+7. Sueño, estrés, medicamentos y suplementos.
+8. PIN o biometría local.
+9. Escáner de código de barras como función posterior.
+
+### Mejora 01: Comidas Habituales
+
+El usuario podrá guardar una combinación de alimentos como comida habitual, por ejemplo:
+
+```text
+Desayuno habitual: Pan + Huevo + Café
+```
+
+Al seleccionar una comida habitual, sus alimentos se cargarán automáticamente en el formulario actual. Las comidas habituales se almacenarán en tablas locales `meal_templates` y `meal_template_foods`, sin reemplazar los registros históricos.
+
+Reglas:
+
+- El nombre de la comida habitual será obligatorio.
+- Debe contener al menos un alimento.
+- Podrá utilizarse para desayuno, almuerzo, cena o snack.
+- Podrá desactivarse sin eliminar comidas históricas.
+- Los cambios posteriores no modificarán comidas ya registradas.
+
+Estado: implementada la persistencia local, selección desde el formulario y guardado de combinaciones habituales.
+
 ## Mejoras UX Implementadas
 
 - El backup permite seleccionar la carpeta de destino y muestra la ruta generada.

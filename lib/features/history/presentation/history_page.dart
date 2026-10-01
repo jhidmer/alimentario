@@ -6,6 +6,7 @@ import '../../foods/data/category_repository.dart';
 import '../../meals/data/meal_repository_impl.dart';
 import '../../meals/domain/meal_repository.dart';
 import '../../meals/presentation/meal_entry_page.dart';
+import '../../meals/data/meal_template_repository_impl.dart';
 import '../../reactions/data/reaction_repository_impl.dart';
 import '../../reactions/domain/reaction_repository.dart';
 import '../../reactions/presentation/reaction_entry_page.dart';
@@ -21,6 +22,7 @@ class _HistoryPageState extends State<HistoryPage> {
   late final MealRepositoryImpl _meals;
   late final FoodRepositoryImpl _foods;
   late final CategoryRepository _categories;
+  late final MealTemplateRepositoryImpl _templates;
   late final ReactionRepositoryImpl _reactions;
   late DateTime _month;
   late DateTime _selectedDay;
@@ -33,6 +35,7 @@ class _HistoryPageState extends State<HistoryPage> {
     _meals = MealRepositoryImpl(appDatabase);
     _foods = FoodRepositoryImpl(appDatabase);
     _categories = CategoryRepositoryImpl(appDatabase);
+    _templates = MealTemplateRepositoryImpl(appDatabase);
     _reactions = ReactionRepositoryImpl(appDatabase);
     final now = DateTime.now();
     _month = DateTime(now.year, now.month);
@@ -96,7 +99,7 @@ class _HistoryPageState extends State<HistoryPage> {
 
   Future<void> _editMeal(MealSummary meal) async {
     final saved = await Navigator.of(context).push<bool>(MaterialPageRoute(
-      builder: (_) => MealEntryPage(type: meal.type, initialMeal: meal, foodRepository: _foods, categoryRepository: _categories, mealRepository: _meals),
+      builder: (_) => MealEntryPage(type: meal.type, initialMeal: meal, foodRepository: _foods, categoryRepository: _categories, mealRepository: _meals, templateRepository: _templates),
     ));
     if (saved == true && mounted) {
       setState(() {

@@ -5,11 +5,12 @@ import 'package:alimentos/features/foods/domain/food_repository.dart';
 import 'package:alimentos/features/foods/data/category_repository.dart';
 import 'package:alimentos/features/meals/domain/meal_repository.dart';
 import 'package:alimentos/features/meals/presentation/meal_entry_page.dart';
+import 'package:alimentos/features/meals/data/meal_template_repository_impl.dart';
 
 void main() {
   testWidgets('registra una comida con un alimento seleccionado', (tester) async {
     final meals = _FakeMealRepository();
-    await tester.pumpWidget(MaterialApp(home: MealEntryPage(type: MealType.breakfast, foodRepository: _FakeFoodRepository(), categoryRepository: _FakeCategoryRepository(), mealRepository: meals)));
+    await tester.pumpWidget(MaterialApp(home: MealEntryPage(type: MealType.breakfast, foodRepository: _FakeFoodRepository(), categoryRepository: _FakeCategoryRepository(), mealRepository: meals, templateRepository: _FakeTemplateRepository())));
     await tester.pump();
     await tester.tap(find.text('Pan'));
     await tester.tap(find.text('Guardar comida'));
@@ -61,4 +62,15 @@ class _FakeMealRepository implements MealRepository {
 
   @override
   Future<void> update(int mealId, MealDraft draft) async {}
+}
+
+class _FakeTemplateRepository implements MealTemplateRepository {
+  @override
+  Future<List<MealTemplateSummary>> findActive() async => const [];
+
+  @override
+  Future<void> create(String name, MealType type, List<int> foodIds) async {}
+
+  @override
+  Future<void> deactivate(int id) async {}
 }
