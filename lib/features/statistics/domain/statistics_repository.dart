@@ -18,6 +18,13 @@ class CategoryFrequency {
   final double percentage;
 }
 
+class TrendPoint {
+  const TrendPoint({required this.day, required this.meals, required this.reactions});
+  final DateTime day;
+  final int meals;
+  final int reactions;
+}
+
 class StatisticsSnapshot {
   const StatisticsSnapshot({
     required this.registeredDays,
@@ -32,6 +39,7 @@ class StatisticsSnapshot {
     required this.averageDuration,
     required this.commonHour,
     required this.commonBodyArea,
+    required this.trends,
   });
 
   final int registeredDays;
@@ -46,6 +54,7 @@ class StatisticsSnapshot {
   final double averageDuration;
   final int? commonHour;
   final String? commonBodyArea;
+  final List<TrendPoint> trends;
 }
 
 abstract interface class StatisticsRepository {

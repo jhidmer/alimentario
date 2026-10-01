@@ -72,11 +72,11 @@ class _StatisticsPageState extends State<StatisticsPage> with SingleTickerProvid
   @override
   Widget build(BuildContext context) {
     return DefaultTabController(
-      length: 4,
+      length: 5,
       child: Scaffold(
         appBar: AppBar(
           title: const Text('Estadísticas'),
-          bottom: const TabBar(tabs: [Tab(text: 'Resumen'), Tab(text: 'Alimentos'), Tab(text: 'Reacciones'), Tab(text: 'Patrones')]),
+          bottom: const TabBar(isScrollable: true, tabs: [Tab(text: 'Resumen'), Tab(text: 'Alimentos'), Tab(text: 'Reacciones'), Tab(text: 'Tendencias'), Tab(text: 'Patrones')]),
         ),
         body: FutureBuilder<StatisticsSnapshot>(
           future: _snapshot,
@@ -104,6 +104,7 @@ class _StatisticsPageState extends State<StatisticsPage> with SingleTickerProvid
                 _SummaryTab(data: data),
                 _FoodsTab(data: data),
                 _ReactionsTab(data: data),
+                _TrendsTab(data: data),
                 const PatternsPage(),
               ])),
             ]);
@@ -170,6 +171,51 @@ class _ReactionsTab extends StatelessWidget {
       ...data.symptoms.take(10).map((item) => _RankTile(name: item.name, value: item.count)),
     ]);
   }
+}
+
+class _TrendsTab extends StatelessWidget {
+  const _TrendsTab({required this.data});
+  final StatisticsSnapshot data;
+
+  @override
+  Widget build(BuildContext context) {
+    final maxValue = data.trends.fold<int>(0, (max, point) => [max, point.meals, point.reactions].reduce((a, b) => a > b ? a : b));
+    if (data.trends.isEmpty || maxValue == 0) return const Center(child: Text('No hay datos para mostrar tendencias.'));
+    return ListView(padding: const EdgeInsets.fromLTRB(20, 16, 20, 28), children: [
+      Text('Actividad diaria', style: Theme.of(context).textTheme.titleMedium),
+      const SizedBox(height: 8),
+      const Row(children: [_LegendDot(color: Colors.green, label: 'Comidas'), SizedBox(width: 16), _LegendDot(color: Colors.deepOrange, label: 'Reacciones')]),
+      const SizedBox(height: 16),
+      ...data.trends.map((point) => Padding(
+            padding: const EdgeInsets.only(bottom: 8),
+            child: Row(children: [
+              SizedBox(width: 42, child: Text('${point.day.day}/${point.day.month}', style: Theme.of(context).textTheme.labelSmall)),
+              Expanded(child: Column(children: [
+                _TrendBar(value: point.meals, maxValue: maxValue, color: Colors.green),
+                const SizedBox(height: 3),
+                _TrendBar(value: point.reactions, maxValue: maxValue, color: Colors.deepOrange),
+              ])),
+            ]),
+          )),
+    ]);
+  }
+}
+
+class _TrendBar extends StatelessWidget {
+  const _TrendBar({required this.value, required this.maxValue, required this.color});
+  final int value;
+  final int maxValue;
+  final Color color;
+  @override
+  Widget build(BuildContext context) => Align(alignment: Alignment.centerLeft, child: FractionallySizedBox(widthFactor: value == 0 ? 0.01 : value / maxValue, child: Container(height: 8, decoration: BoxDecoration(color: color, borderRadius: BorderRadius.circular(8)))));
+}
+
+class _LegendDot extends StatelessWidget {
+  const _LegendDot({required this.color, required this.label});
+  final Color color;
+  final String label;
+  @override
+  Widget build(BuildContext context) => Row(mainAxisSize: MainAxisSize.min, children: [Container(width: 8, height: 8, decoration: BoxDecoration(color: color, shape: BoxShape.circle)), const SizedBox(width: 5), Text(label)]);
 }
 
 class _StatTile extends StatelessWidget {

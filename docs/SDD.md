@@ -190,6 +190,12 @@ Los patrones mostrarán siempre el tamaño de muestra y no solo el porcentaje. S
 
 Estas etiquetas no representan una validación médica ni causalidad. Sirven para evitar que el usuario interprete porcentajes pequeños como conclusiones firmes.
 
+### Mejora 06: Gráficos De Tendencias
+
+Estadísticas mostrará una vista diaria de comidas y reacciones para el periodo elegido. La vista será descriptiva, no diagnóstica, y no afirmará causalidad.
+
+Estado: implementada con barras diarias para los últimos 31 días del periodo seleccionado.
+
 ## Mejoras UX Implementadas
 
 - El backup permite seleccionar la carpeta de destino y muestra la ruta generada.

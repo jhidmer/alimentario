@@ -27,9 +27,12 @@ class StatisticsRepositoryImpl implements StatisticsRepository {
     final foodCounts = <String, int>{};
     final categoryCounts = <String, int>{};
     final foodIds = <int>{};
+    final trendMeals = <DateTime, int>{};
+    final trendReactions = <DateTime, int>{};
 
     for (final meal in meals) {
       mealDays.add(_day(meal.mealDatetime));
+      trendMeals.update(_day(meal.mealDatetime), (count) => count + 1, ifAbsent: () => 1);
       final links = await _database.mealDao.foodsForMeal(meal.id);
       for (final link in links) {
         final food = await _database.foodDao.findById(link.foodId);
@@ -49,6 +52,7 @@ class StatisticsRepositoryImpl implements StatisticsRepository {
     final bodyAreas = <String, int>{};
     for (final reaction in reactions) {
       reactionDays.add(_day(reaction.startedAt));
+      trendReactions.update(_day(reaction.startedAt), (count) => count + 1, ifAbsent: () => 1);
       intensityTotal += reaction.intensity;
       hours.update(reaction.startedAt.hour, (count) => count + 1, ifAbsent: () => 1);
       if (reaction.bodyArea != null && reaction.bodyArea!.isNotEmpty) bodyAreas.update(reaction.bodyArea!, (count) => count + 1, ifAbsent: () => 1);
@@ -76,6 +80,7 @@ class StatisticsRepositoryImpl implements StatisticsRepository {
       averageDuration: durationCount == 0 ? 0 : durationTotal / durationCount,
       commonHour: _mostCommon(hours),
       commonBodyArea: _mostCommonKey(bodyAreas),
+      trends: _buildTrends(period, trendMeals, trendReactions),
     );
   }
 
@@ -88,4 +93,14 @@ class StatisticsRepositoryImpl implements StatisticsRepository {
   DateTime _day(DateTime value) => DateTime(value.year, value.month, value.day);
   int? _mostCommon(Map<int, int> values) => values.isEmpty ? null : (values.entries.toList()..sort((a, b) => b.value.compareTo(a.value))).first.key;
   String? _mostCommonKey(Map<String, int> values) => values.isEmpty ? null : (values.entries.toList()..sort((a, b) => b.value.compareTo(a.value))).first.key;
+
+  List<TrendPoint> _buildTrends(StatisticsPeriod period, Map<DateTime, int> meals, Map<DateTime, int> reactions) {
+    final from = _day(period.from);
+    final to = _day(period.to);
+    final points = <TrendPoint>[];
+    for (var day = from; !day.isAfter(to); day = day.add(const Duration(days: 1))) {
+      points.add(TrendPoint(day: day, meals: meals[day] ?? 0, reactions: reactions[day] ?? 0));
+    }
+    return points.length > 31 ? points.sublist(points.length - 31) : points;
+  }
 }
