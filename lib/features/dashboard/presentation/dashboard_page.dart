@@ -7,10 +7,12 @@ import '../../foods/data/category_repository.dart';
 import '../../meals/data/meal_repository_impl.dart';
 import '../../meals/domain/meal_repository.dart';
 import '../../meals/presentation/meal_entry_page.dart';
+import '../../meals/presentation/meal_detail_page.dart';
 import '../../meals/data/meal_template_repository_impl.dart';
 import '../../reactions/data/reaction_repository_impl.dart';
 import '../../reactions/domain/reaction_repository.dart';
 import '../../reactions/presentation/reaction_entry_page.dart';
+import '../../reactions/presentation/reaction_detail_page.dart';
 
 class DashboardPage extends StatefulWidget {
   const DashboardPage({super.key});
@@ -104,6 +106,33 @@ class _DashboardPageState extends State<DashboardPage> {
     }
   }
 
+  Future<void> _openMealDetail(MealSummary meal) async {
+    await Navigator.of(context).push(MaterialPageRoute(builder: (_) => MealDetailPage(meal: meal, onEdit: () => _editMeal(meal), onDelete: () => _deleteMeal(meal))));
+    if (mounted) setState(_load);
+  }
+
+  Future<void> _editReaction(ReactionSummary reaction) async {
+    final saved = await Navigator.of(context).push<bool>(MaterialPageRoute(builder: (_) => ReactionEntryPage(repository: _reactions, initialReaction: reaction)));
+    if (saved == true && mounted) setState(_load);
+  }
+
+  Future<void> _deleteReaction(ReactionSummary reaction) async {
+    final confirmed = await showDialog<bool>(context: context, builder: (context) => AlertDialog(
+          title: const Text('Eliminar reacción'),
+          content: const Text('Esta acción no se puede deshacer.'),
+          actions: [TextButton(onPressed: () => Navigator.pop(context, false), child: const Text('Cancelar')), FilledButton(onPressed: () => Navigator.pop(context, true), child: const Text('Eliminar'))],
+        ));
+    if (confirmed == true) {
+      await _reactions.delete(reaction.id);
+      if (mounted) setState(_load);
+    }
+  }
+
+  Future<void> _openReactionDetail(ReactionSummary reaction) async {
+    await Navigator.of(context).push(MaterialPageRoute(builder: (_) => ReactionDetailPage(reaction: reaction, onEdit: () => _editReaction(reaction), onDelete: () => _deleteReaction(reaction))));
+    if (mounted) setState(_load);
+  }
+
   Future<void> _chooseMealType() async {
     final type = await showModalBottomSheet<MealType>(
       context: context,
@@ -146,7 +175,7 @@ class _DashboardPageState extends State<DashboardPage> {
               const SizedBox(height: 24),
               ...MealType.values.map((type) => Padding(
                     padding: const EdgeInsets.only(bottom: 16),
-                    child: _MealSection(type: type, meals: meals.where((meal) => meal.type == type).toList(), onAdd: () => _openMeal(type), onEdit: _editMeal, onDelete: _deleteMeal),
+                    child: _MealSection(type: type, meals: meals.where((meal) => meal.type == type).toList(), onAdd: () => _openMeal(type), onOpen: _openMealDetail, onEdit: _editMeal, onDelete: _deleteMeal),
                   )),
               FutureBuilder<List<ReactionSummary>>(
                 future: _todayReactions,
@@ -165,6 +194,7 @@ class _DashboardPageState extends State<DashboardPage> {
                               contentPadding: EdgeInsets.zero,
                               title: Text(_timeLabel(reaction.startedAt)),
                               subtitle: Text('${reaction.symptoms.join(' · ')}\n${_intensityLabel(reaction.intensity)}${reaction.status == ReactionStatus.active ? ' · Continúa' : ''}'),
+                              onTap: () => _openReactionDetail(reaction),
                               trailing: reaction.status == ReactionStatus.active
                                   ? TextButton(onPressed: () => _finishReaction(reaction), child: const Text('Finalizar'))
                                   : null,
@@ -183,13 +213,14 @@ class _DashboardPageState extends State<DashboardPage> {
 }
 
 class _MealSection extends StatelessWidget {
-  const _MealSection({required this.type, required this.meals, required this.onAdd, required this.onEdit, required this.onDelete});
+  const _MealSection({required this.type, required this.meals, required this.onAdd, required this.onOpen, required this.onEdit, required this.onDelete});
 
   final MealType type;
   final List<MealSummary> meals;
   final VoidCallback onAdd;
   final ValueChanged<MealSummary> onEdit;
   final ValueChanged<MealSummary> onDelete;
+  final ValueChanged<MealSummary> onOpen;
 
   @override
   Widget build(BuildContext context) {
@@ -204,6 +235,7 @@ class _MealSection extends StatelessWidget {
                 contentPadding: EdgeInsets.zero,
                 title: Text(_timeLabel(meal.mealDatetime)),
                 subtitle: Text(meal.displayFoodNames.join(' · ')),
+                onTap: () => onOpen(meal),
                 trailing: PopupMenuButton<String>(
                   onSelected: (value) => value == 'edit' ? onEdit(meal) : onDelete(meal),
                   itemBuilder: (_) => const [

@@ -6,10 +6,12 @@ import '../../foods/data/category_repository.dart';
 import '../../meals/data/meal_repository_impl.dart';
 import '../../meals/domain/meal_repository.dart';
 import '../../meals/presentation/meal_entry_page.dart';
+import '../../meals/presentation/meal_detail_page.dart';
 import '../../meals/data/meal_template_repository_impl.dart';
 import '../../reactions/data/reaction_repository_impl.dart';
 import '../../reactions/domain/reaction_repository.dart';
 import '../../reactions/presentation/reaction_entry_page.dart';
+import '../../reactions/presentation/reaction_detail_page.dart';
 
 class HistoryPage extends StatefulWidget {
   const HistoryPage({super.key});
@@ -121,6 +123,26 @@ class _HistoryPageState extends State<HistoryPage> {
     }
   }
 
+  Future<void> _openMealDetail(MealSummary meal) async {
+    await Navigator.of(context).push(MaterialPageRoute(builder: (_) => MealDetailPage(meal: meal, onEdit: () => _editMeal(meal), onDelete: () => _deleteMeal(meal))));
+    if (mounted) {
+      setState(() {
+        _monthData = _loadMonth(_month);
+        _dayData = _loadDay(_selectedDay);
+      });
+    }
+  }
+
+  Future<void> _openReactionDetail(ReactionSummary reaction) async {
+    await Navigator.of(context).push(MaterialPageRoute(builder: (_) => ReactionDetailPage(reaction: reaction, onEdit: () => _editReaction(reaction), onDelete: () => _deleteReaction(reaction))));
+    if (mounted) {
+      setState(() {
+        _monthData = _loadMonth(_month);
+        _dayData = _loadDay(_selectedDay);
+      });
+    }
+  }
+
   Future<bool> _confirmDelete(String label) async => await showDialog<bool>(
         context: context,
         builder: (context) => AlertDialog(
@@ -156,7 +178,7 @@ class _HistoryPageState extends State<HistoryPage> {
             future: _dayData,
             builder: (context, snapshot) {
               if (!snapshot.hasData) return const Center(child: CircularProgressIndicator());
-              return _Timeline(data: snapshot.data!, onDeleteMeal: _deleteMeal, onEditMeal: _editMeal, onEditReaction: _editReaction, onDeleteReaction: _deleteReaction);
+              return _Timeline(data: snapshot.data!, onOpenMeal: _openMealDetail, onDeleteMeal: _deleteMeal, onEditMeal: _editMeal, onOpenReaction: _openReactionDetail, onEditReaction: _editReaction, onDeleteReaction: _deleteReaction);
             },
           ),
         ],
@@ -255,34 +277,37 @@ class _Dot extends StatelessWidget {
 }
 
 class _Timeline extends StatelessWidget {
-  const _Timeline({required this.data, required this.onDeleteMeal, required this.onEditMeal, required this.onEditReaction, required this.onDeleteReaction});
+  const _Timeline({required this.data, required this.onOpenMeal, required this.onDeleteMeal, required this.onEditMeal, required this.onOpenReaction, required this.onEditReaction, required this.onDeleteReaction});
   final _DayData data;
   final ValueChanged<MealSummary> onDeleteMeal;
   final ValueChanged<MealSummary> onEditMeal;
+  final ValueChanged<MealSummary> onOpenMeal;
   final ValueChanged<ReactionSummary> onEditReaction;
+  final ValueChanged<ReactionSummary> onOpenReaction;
   final ValueChanged<ReactionSummary> onDeleteReaction;
 
   @override
   Widget build(BuildContext context) {
     final entries = <_TimelineEntry>[
-      ...data.meals.map((meal) => _TimelineEntry(time: meal.mealDatetime, icon: Icons.restaurant, title: _mealTypeLabel(meal.type), detail: meal.displayFoodNames.join(' · '), onEdit: () => onEditMeal(meal), onDelete: () => onDeleteMeal(meal))),
-      ...data.reactions.map((reaction) => _TimelineEntry(time: reaction.startedAt, icon: Icons.monitor_heart, title: 'Reacción', detail: '${reaction.symptoms.join(' · ')} · ${_intensityLabel(reaction.intensity)}', onEdit: () => onEditReaction(reaction), onDelete: () => onDeleteReaction(reaction))),
+      ...data.meals.map((meal) => _TimelineEntry(time: meal.mealDatetime, icon: Icons.restaurant, title: _mealTypeLabel(meal.type), detail: meal.displayFoodNames.join(' · '), onOpen: () => onOpenMeal(meal), onEdit: () => onEditMeal(meal), onDelete: () => onDeleteMeal(meal))),
+      ...data.reactions.map((reaction) => _TimelineEntry(time: reaction.startedAt, icon: Icons.monitor_heart, title: 'Reacción', detail: '${reaction.symptoms.join(' · ')} · ${_intensityLabel(reaction.intensity)}', onOpen: () => onOpenReaction(reaction), onEdit: () => onEditReaction(reaction), onDelete: () => onDeleteReaction(reaction))),
     ]..sort((a, b) => a.time.compareTo(b.time));
     if (entries.isEmpty) return const Text('No hay registros para este día.');
     return Column(children: entries.map((entry) => Card(child: ListTile(
-          leading: Icon(entry.icon), title: Text(entry.title), subtitle: Text(entry.detail), trailing: Row(mainAxisSize: MainAxisSize.min, children: [Text(_timeLabel(entry.time)), PopupMenuButton<String>(onSelected: (value) { if (value == 'edit') entry.onEdit?.call(); if (value == 'delete') entry.onDelete(); }, itemBuilder: (_) => const [PopupMenuItem(value: 'edit', child: Text('Editar')), PopupMenuItem(value: 'delete', child: Text('Eliminar'))])]),
+          leading: Icon(entry.icon), title: Text(entry.title), subtitle: Text(entry.detail), onTap: entry.onOpen, trailing: Row(mainAxisSize: MainAxisSize.min, children: [Text(_timeLabel(entry.time)), PopupMenuButton<String>(onSelected: (value) { if (value == 'edit') entry.onEdit?.call(); if (value == 'delete') entry.onDelete(); }, itemBuilder: (_) => const [PopupMenuItem(value: 'edit', child: Text('Editar')), PopupMenuItem(value: 'delete', child: Text('Eliminar'))])]),
         ))).toList());
   }
 }
 
 class _TimelineEntry {
-  const _TimelineEntry({required this.time, required this.icon, required this.title, required this.detail, this.onEdit, required this.onDelete});
+  const _TimelineEntry({required this.time, required this.icon, required this.title, required this.detail, required this.onOpen, this.onEdit, required this.onDelete});
   final DateTime time;
   final IconData icon;
   final String title;
   final String detail;
   final VoidCallback onDelete;
   final VoidCallback? onEdit;
+  final VoidCallback onOpen;
 }
 
 String _dayTitle(DateTime date) => '${date.day} de ${_monthNames[date.month - 1]} de ${date.year}';

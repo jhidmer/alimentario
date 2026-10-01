@@ -173,6 +173,12 @@ Estado: implementada la persistencia local, selección desde el formulario, guar
 
 El usuario podrá activar un recordatorio diario y seleccionar la hora. Las notificaciones se programarán localmente, sin cuenta, servidor ni conexión a Internet. El permiso podrá rechazarse sin afectar el registro de comidas.
 
+### Mejora 04: Detalle De Registros
+
+Cada comida y reacción tendrá una vista de detalle accesible desde Hoy e Historial. La vista mostrará toda la información guardada y mantendrá acciones de edición y eliminación.
+
+Estado: implementada para comidas y reacciones, incluyendo fotografías de reacciones.
+
 ## Mejoras UX Implementadas
 
 - El backup permite seleccionar la carpeta de destino y muestra la ruta generada.
