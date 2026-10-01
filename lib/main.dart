@@ -45,13 +45,16 @@ class _FoodDiaryAppState extends State<FoodDiaryApp> {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Diario Alimentario',
-      debugShowCheckedModeBanner: false,
-      theme: AppTheme.light,
-      darkTheme: AppTheme.dark,
-      themeMode: _themeController.mode,
-      home: widget.skipOnboarding ? AppShell(themeController: _themeController) : AppStartup(themeController: _themeController),
+    return AnimatedBuilder(
+      animation: _themeController,
+      builder: (context, child) => MaterialApp(
+        title: 'Diario Alimentario',
+        debugShowCheckedModeBanner: false,
+        theme: AppTheme.light,
+        darkTheme: AppTheme.dark,
+        themeMode: _themeController.mode,
+        home: widget.skipOnboarding ? AppShell(themeController: _themeController) : AppStartup(themeController: _themeController),
+      ),
     );
   }
 }

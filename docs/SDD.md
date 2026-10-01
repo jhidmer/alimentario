@@ -117,3 +117,27 @@ La lista de pruebas incluirá:
 10. Publicar la primera versión.
 
 La generación de APK o AAB no se ejecutará automáticamente durante el desarrollo. Solo se realizará cuando sea indicada explícitamente.
+
+## Referencia De Aplicaciones Similares
+
+La revisión de mySymptoms Food Diary y Bearable muestra patrones de UX que pueden mejorar Diario Alimentario sin cambiar su principio offline-first:
+
+- registro de comidas y síntomas en pocos toques;
+- alimentos frecuentes y recientes visibles al iniciar cada registro;
+- comidas habituales reutilizables;
+- personalización de alimentos, síntomas y factores de contexto;
+- intensidad y duración de síntomas;
+- informes CSV/PDF para compartir con profesionales;
+- análisis temporal con advertencia de no causalidad;
+- indicadores de confianza o cantidad mínima de registros antes de mostrar una asociación;
+- respaldo y eliminación controlados por el usuario;
+- recordatorios locales opcionales en una fase posterior.
+
+Estas referencias no implican copiar funcionalidades, diseño ni contenido de terceros. Se utilizarán únicamente como criterios de mejora de experiencia.
+
+## Mejoras UX Implementadas
+
+- El backup permite seleccionar la carpeta de destino y muestra la ruta generada.
+- El tema claro/oscuro se persiste y se aplica inmediatamente.
+- Hoy permite editar y eliminar comidas desde cada registro.
+- La creación rápida de alimentos conserva la comida en curso y selecciona el alimento nuevo automáticamente.

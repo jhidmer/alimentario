@@ -76,6 +76,31 @@ class _DashboardPageState extends State<DashboardPage> {
     if (saved == true && mounted) setState(_load);
   }
 
+  Future<void> _editMeal(MealSummary meal) async {
+    final saved = await Navigator.of(context).push<bool>(MaterialPageRoute(
+      builder: (_) => MealEntryPage(type: meal.type, initialMeal: meal, foodRepository: _foods, categoryRepository: _categories, mealRepository: _meals),
+    ));
+    if (saved == true && mounted) setState(_load);
+  }
+
+  Future<void> _deleteMeal(MealSummary meal) async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Eliminar comida'),
+        content: const Text('Esta acción no se puede deshacer.'),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(context, false), child: const Text('Cancelar')),
+          FilledButton(onPressed: () => Navigator.pop(context, true), child: const Text('Eliminar')),
+        ],
+      ),
+    );
+    if (confirmed == true) {
+      await _meals.delete(meal.id);
+      if (mounted) setState(_load);
+    }
+  }
+
   Future<void> _chooseMealType() async {
     final type = await showModalBottomSheet<MealType>(
       context: context,
@@ -118,7 +143,7 @@ class _DashboardPageState extends State<DashboardPage> {
               const SizedBox(height: 24),
               ...MealType.values.map((type) => Padding(
                     padding: const EdgeInsets.only(bottom: 16),
-                    child: _MealSection(type: type, meals: meals.where((meal) => meal.type == type).toList(), onAdd: () => _openMeal(type)),
+                    child: _MealSection(type: type, meals: meals.where((meal) => meal.type == type).toList(), onAdd: () => _openMeal(type), onEdit: _editMeal, onDelete: _deleteMeal),
                   )),
               FutureBuilder<List<ReactionSummary>>(
                 future: _todayReactions,
@@ -155,11 +180,13 @@ class _DashboardPageState extends State<DashboardPage> {
 }
 
 class _MealSection extends StatelessWidget {
-  const _MealSection({required this.type, required this.meals, required this.onAdd});
+  const _MealSection({required this.type, required this.meals, required this.onAdd, required this.onEdit, required this.onDelete});
 
   final MealType type;
   final List<MealSummary> meals;
   final VoidCallback onAdd;
+  final ValueChanged<MealSummary> onEdit;
+  final ValueChanged<MealSummary> onDelete;
 
   @override
   Widget build(BuildContext context) {
@@ -174,6 +201,13 @@ class _MealSection extends StatelessWidget {
                 contentPadding: EdgeInsets.zero,
                 title: Text(_timeLabel(meal.mealDatetime)),
                 subtitle: Text(meal.foodNames.join(' · ')),
+                trailing: PopupMenuButton<String>(
+                  onSelected: (value) => value == 'edit' ? onEdit(meal) : onDelete(meal),
+                  itemBuilder: (_) => const [
+                    PopupMenuItem(value: 'edit', child: Text('Editar')),
+                    PopupMenuItem(value: 'delete', child: Text('Eliminar')),
+                  ],
+                ),
               )),
         Align(alignment: Alignment.centerRight, child: TextButton.icon(onPressed: onAdd, icon: const Icon(Icons.add), label: const Text('Registrar'))),
       ]),

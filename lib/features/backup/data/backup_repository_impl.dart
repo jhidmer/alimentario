@@ -14,7 +14,7 @@ class BackupRepositoryImpl implements BackupRepository {
   final AppDatabase _database;
 
   @override
-  Future<String> createBackup() async {
+  Future<String> createBackup({String? destinationDirectory}) async {
     final databaseFile = File(await _database.filePath());
     if (!await databaseFile.exists()) throw const FormatException('La base de datos no existe.');
     final archive = Archive();
@@ -33,7 +33,7 @@ class BackupRepositoryImpl implements BackupRepository {
     archive.addFile(ArchiveFile('metadata.json', metadata.length, metadata));
     final encoded = ZipEncoder().encode(archive);
     final directory = await getApplicationDocumentsDirectory();
-    final backupDirectory = Directory(path.join(directory.path, 'backups'));
+    final backupDirectory = Directory(destinationDirectory ?? path.join(directory.path, 'backups'));
     await backupDirectory.create(recursive: true);
     final file = File(path.join(backupDirectory.path, 'diario_${_stamp(DateTime.now())}.diarybackup'));
     await file.writeAsBytes(encoded, flush: true);

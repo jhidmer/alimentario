@@ -49,7 +49,9 @@ class _SettingsPageState extends State<SettingsPage> {
 
   Future<void> _createBackup() async {
     try {
-      final path = await _backups.createBackup();
+      final directory = await getDirectoryPath();
+      if (directory == null || !mounted) return;
+      final path = await _backups.createBackup(destinationDirectory: directory);
       if (mounted) _message('Copia creada: $path');
     } on FormatException catch (error) {
       if (mounted) _message(error.message);
