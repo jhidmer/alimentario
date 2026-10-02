@@ -197,6 +197,12 @@ El usuario podrá registrar varias tomas de agua por día en mililitros, agregar
 
 Estado: implementado el registro, total diario y eliminación; la integración con estadísticas queda para una etapa posterior.
 
+### Mejora 11: Estado De Ánimo
+
+El contexto diario permite registrar una escala de ánimo de 1 a 5 y notas opcionales. El registro es local y descriptivo; no representa una evaluación psicológica ni médica.
+
+Estado: implementado el registro y edición diaria; la integración con tendencias queda para una etapa posterior.
+
 ### Mejora 09: Actividad Física
 
 El contexto diario permite registrar caminar, correr, bicicleta, gimnasio, deporte, estiramiento u otra actividad, junto con duración, intensidad y notas opcionales.

@@ -4,13 +4,15 @@ import '../domain/context_repository.dart';
 import '../domain/medication_repository.dart';
 import '../domain/activity_repository.dart';
 import '../domain/water_repository.dart';
+import '../domain/mood_repository.dart';
 
 class ContextEntryPage extends StatefulWidget {
-  const ContextEntryPage({required this.repository, required this.medicationRepository, required this.activityRepository, required this.waterRepository, required this.date, this.initial, super.key});
+  const ContextEntryPage({required this.repository, required this.medicationRepository, required this.activityRepository, required this.waterRepository, required this.moodRepository, required this.date, this.initial, super.key});
   final ContextRepository repository;
   final MedicationRepository medicationRepository;
   final ActivityRepository activityRepository;
   final WaterRepository waterRepository;
+  final MoodRepository moodRepository;
   final DateTime date;
   final DailyContextSummary? initial;
 
@@ -26,6 +28,7 @@ class _ContextEntryPageState extends State<ContextEntryPage> {
   late Future<List<DailyMedicationSummary>> _medications;
   late Future<List<DailyActivitySummary>> _activities;
   late Future<List<WaterEntrySummary>> _waterEntries;
+  late Future<MoodSummary?> _mood;
 
   @override
   void initState() {
@@ -38,6 +41,7 @@ class _ContextEntryPageState extends State<ContextEntryPage> {
     _medications = widget.medicationRepository.forDay(widget.date);
     _activities = widget.activityRepository.forDay(widget.date);
     _waterEntries = widget.waterRepository.forDay(widget.date);
+    _mood = widget.moodRepository.forDay(widget.date);
   }
 
   @override
@@ -125,6 +129,24 @@ class _ContextEntryPageState extends State<ContextEntryPage> {
     if (mounted) setState(() => _waterEntries = widget.waterRepository.forDay(widget.date));
   }
 
+  Future<void> _editMood() async {
+    final current = await _mood;
+    if (!mounted) return;
+    var selected = current?.mood ?? 3;
+    final notes = TextEditingController(text: current?.notes ?? '');
+    final saved = await showDialog<bool>(context: context, builder: (context) => StatefulBuilder(builder: (context, setDialogState) => AlertDialog(
+          title: const Text('Estado de ánimo'),
+          content: Column(mainAxisSize: MainAxisSize.min, children: [
+            SegmentedButton<int>(segments: const [ButtonSegment(value: 1, label: Text('Muy bajo')), ButtonSegment(value: 2, label: Text('Bajo')), ButtonSegment(value: 3, label: Text('Neutral')), ButtonSegment(value: 4, label: Text('Bueno')), ButtonSegment(value: 5, label: Text('Muy bueno'))], selected: {selected}, onSelectionChanged: (value) => setDialogState(() => selected = value.first)),
+            const SizedBox(height: 12),
+            TextField(controller: notes, maxLines: 2, decoration: const InputDecoration(labelText: 'Notas (opcional)')),
+          ]),
+          actions: [TextButton(onPressed: () => Navigator.pop(context, false), child: const Text('Cancelar')), FilledButton(onPressed: () async { await widget.moodRepository.save(widget.date, selected, notes.text); if (context.mounted) Navigator.pop(context, true); }, child: const Text('Guardar'))],
+        )));
+    notes.dispose();
+    if (saved == true && mounted) setState(() => _mood = widget.moodRepository.forDay(widget.date));
+  }
+
   @override
   Widget build(BuildContext context) => Scaffold(
         appBar: AppBar(title: const Text('Contexto del día')),
@@ -204,9 +226,16 @@ class _ContextEntryPageState extends State<ContextEntryPage> {
             },
           ),
           const SizedBox(height: 18),
+          FutureBuilder<MoodSummary?>(future: _mood, builder: (context, snapshot) {
+            final mood = snapshot.data;
+            return Card(child: ListTile(leading: const Icon(Icons.mood_outlined), title: const Text('Estado de ánimo'), subtitle: Text(mood == null ? 'Sin registrar' : _moodLabel(mood.mood)), trailing: const Icon(Icons.chevron_right), onTap: _editMood));
+          }),
+          const SizedBox(height: 18),
           TextField(controller: _notesController, maxLines: 3, decoration: const InputDecoration(labelText: 'Notas (opcional)')),
           const SizedBox(height: 28),
           FilledButton.icon(onPressed: _save, icon: const Icon(Icons.save), label: const Text('Guardar contexto')),
         ]),
       );
 }
+
+String _moodLabel(int value) => switch (value) { 1 => 'Muy bajo', 2 => 'Bajo', 3 => 'Neutral', 4 => 'Bueno', 5 => 'Muy bueno', _ => 'Sin datos' };
