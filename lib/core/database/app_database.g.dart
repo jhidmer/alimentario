@@ -3480,6 +3480,349 @@ class DailyActivitiesCompanion extends UpdateCompanion<DailyActivity> {
   }
 }
 
+class $DailyWaterEntriesTable extends DailyWaterEntries
+    with TableInfo<$DailyWaterEntriesTable, DailyWaterEntry> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $DailyWaterEntriesTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<int> id = GeneratedColumn<int>(
+    'id',
+    aliasedName,
+    false,
+    hasAutoIncrement: true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'PRIMARY KEY AUTOINCREMENT',
+    ),
+  );
+  static const VerificationMeta _dateMeta = const VerificationMeta('date');
+  @override
+  late final GeneratedColumn<DateTime> date = GeneratedColumn<DateTime>(
+    'date',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _amountMlMeta = const VerificationMeta(
+    'amountMl',
+  );
+  @override
+  late final GeneratedColumn<int> amountMl = GeneratedColumn<int>(
+    'amount_ml',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _notesMeta = const VerificationMeta('notes');
+  @override
+  late final GeneratedColumn<String> notes = GeneratedColumn<String>(
+    'notes',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _createdAtMeta = const VerificationMeta(
+    'createdAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> createdAt = GeneratedColumn<DateTime>(
+    'created_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: true,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [id, date, amountMl, notes, createdAt];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'daily_water_entries';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<DailyWaterEntry> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    }
+    if (data.containsKey('date')) {
+      context.handle(
+        _dateMeta,
+        date.isAcceptableOrUnknown(data['date']!, _dateMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_dateMeta);
+    }
+    if (data.containsKey('amount_ml')) {
+      context.handle(
+        _amountMlMeta,
+        amountMl.isAcceptableOrUnknown(data['amount_ml']!, _amountMlMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_amountMlMeta);
+    }
+    if (data.containsKey('notes')) {
+      context.handle(
+        _notesMeta,
+        notes.isAcceptableOrUnknown(data['notes']!, _notesMeta),
+      );
+    }
+    if (data.containsKey('created_at')) {
+      context.handle(
+        _createdAtMeta,
+        createdAt.isAcceptableOrUnknown(data['created_at']!, _createdAtMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_createdAtMeta);
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  DailyWaterEntry map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return DailyWaterEntry(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}id'],
+      )!,
+      date: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}date'],
+      )!,
+      amountMl: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}amount_ml'],
+      )!,
+      notes: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}notes'],
+      ),
+      createdAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}created_at'],
+      )!,
+    );
+  }
+
+  @override
+  $DailyWaterEntriesTable createAlias(String alias) {
+    return $DailyWaterEntriesTable(attachedDatabase, alias);
+  }
+}
+
+class DailyWaterEntry extends DataClass implements Insertable<DailyWaterEntry> {
+  final int id;
+  final DateTime date;
+  final int amountMl;
+  final String? notes;
+  final DateTime createdAt;
+  const DailyWaterEntry({
+    required this.id,
+    required this.date,
+    required this.amountMl,
+    this.notes,
+    required this.createdAt,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<int>(id);
+    map['date'] = Variable<DateTime>(date);
+    map['amount_ml'] = Variable<int>(amountMl);
+    if (!nullToAbsent || notes != null) {
+      map['notes'] = Variable<String>(notes);
+    }
+    map['created_at'] = Variable<DateTime>(createdAt);
+    return map;
+  }
+
+  DailyWaterEntriesCompanion toCompanion(bool nullToAbsent) {
+    return DailyWaterEntriesCompanion(
+      id: Value(id),
+      date: Value(date),
+      amountMl: Value(amountMl),
+      notes: notes == null && nullToAbsent
+          ? const Value.absent()
+          : Value(notes),
+      createdAt: Value(createdAt),
+    );
+  }
+
+  factory DailyWaterEntry.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return DailyWaterEntry(
+      id: serializer.fromJson<int>(json['id']),
+      date: serializer.fromJson<DateTime>(json['date']),
+      amountMl: serializer.fromJson<int>(json['amountMl']),
+      notes: serializer.fromJson<String?>(json['notes']),
+      createdAt: serializer.fromJson<DateTime>(json['createdAt']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<int>(id),
+      'date': serializer.toJson<DateTime>(date),
+      'amountMl': serializer.toJson<int>(amountMl),
+      'notes': serializer.toJson<String?>(notes),
+      'createdAt': serializer.toJson<DateTime>(createdAt),
+    };
+  }
+
+  DailyWaterEntry copyWith({
+    int? id,
+    DateTime? date,
+    int? amountMl,
+    Value<String?> notes = const Value.absent(),
+    DateTime? createdAt,
+  }) => DailyWaterEntry(
+    id: id ?? this.id,
+    date: date ?? this.date,
+    amountMl: amountMl ?? this.amountMl,
+    notes: notes.present ? notes.value : this.notes,
+    createdAt: createdAt ?? this.createdAt,
+  );
+  DailyWaterEntry copyWithCompanion(DailyWaterEntriesCompanion data) {
+    return DailyWaterEntry(
+      id: data.id.present ? data.id.value : this.id,
+      date: data.date.present ? data.date.value : this.date,
+      amountMl: data.amountMl.present ? data.amountMl.value : this.amountMl,
+      notes: data.notes.present ? data.notes.value : this.notes,
+      createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('DailyWaterEntry(')
+          ..write('id: $id, ')
+          ..write('date: $date, ')
+          ..write('amountMl: $amountMl, ')
+          ..write('notes: $notes, ')
+          ..write('createdAt: $createdAt')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(id, date, amountMl, notes, createdAt);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is DailyWaterEntry &&
+          other.id == this.id &&
+          other.date == this.date &&
+          other.amountMl == this.amountMl &&
+          other.notes == this.notes &&
+          other.createdAt == this.createdAt);
+}
+
+class DailyWaterEntriesCompanion extends UpdateCompanion<DailyWaterEntry> {
+  final Value<int> id;
+  final Value<DateTime> date;
+  final Value<int> amountMl;
+  final Value<String?> notes;
+  final Value<DateTime> createdAt;
+  const DailyWaterEntriesCompanion({
+    this.id = const Value.absent(),
+    this.date = const Value.absent(),
+    this.amountMl = const Value.absent(),
+    this.notes = const Value.absent(),
+    this.createdAt = const Value.absent(),
+  });
+  DailyWaterEntriesCompanion.insert({
+    this.id = const Value.absent(),
+    required DateTime date,
+    required int amountMl,
+    this.notes = const Value.absent(),
+    required DateTime createdAt,
+  }) : date = Value(date),
+       amountMl = Value(amountMl),
+       createdAt = Value(createdAt);
+  static Insertable<DailyWaterEntry> custom({
+    Expression<int>? id,
+    Expression<DateTime>? date,
+    Expression<int>? amountMl,
+    Expression<String>? notes,
+    Expression<DateTime>? createdAt,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (date != null) 'date': date,
+      if (amountMl != null) 'amount_ml': amountMl,
+      if (notes != null) 'notes': notes,
+      if (createdAt != null) 'created_at': createdAt,
+    });
+  }
+
+  DailyWaterEntriesCompanion copyWith({
+    Value<int>? id,
+    Value<DateTime>? date,
+    Value<int>? amountMl,
+    Value<String?>? notes,
+    Value<DateTime>? createdAt,
+  }) {
+    return DailyWaterEntriesCompanion(
+      id: id ?? this.id,
+      date: date ?? this.date,
+      amountMl: amountMl ?? this.amountMl,
+      notes: notes ?? this.notes,
+      createdAt: createdAt ?? this.createdAt,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<int>(id.value);
+    }
+    if (date.present) {
+      map['date'] = Variable<DateTime>(date.value);
+    }
+    if (amountMl.present) {
+      map['amount_ml'] = Variable<int>(amountMl.value);
+    }
+    if (notes.present) {
+      map['notes'] = Variable<String>(notes.value);
+    }
+    if (createdAt.present) {
+      map['created_at'] = Variable<DateTime>(createdAt.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('DailyWaterEntriesCompanion(')
+          ..write('id: $id, ')
+          ..write('date: $date, ')
+          ..write('amountMl: $amountMl, ')
+          ..write('notes: $notes, ')
+          ..write('createdAt: $createdAt')
+          ..write(')'))
+        .toString();
+  }
+}
+
 class $MealFoodsTable extends MealFoods
     with TableInfo<$MealFoodsTable, MealFood> {
   @override
@@ -6049,6 +6392,8 @@ abstract class _$AppDatabase extends GeneratedDatabase {
   late final $DailyActivitiesTable dailyActivities = $DailyActivitiesTable(
     this,
   );
+  late final $DailyWaterEntriesTable dailyWaterEntries =
+      $DailyWaterEntriesTable(this);
   late final $MealFoodsTable mealFoods = $MealFoodsTable(this);
   late final $SymptomsTable symptoms = $SymptomsTable(this);
   late final $ReactionsTable reactions = $ReactionsTable(this);
@@ -6093,6 +6438,10 @@ abstract class _$AppDatabase extends GeneratedDatabase {
   late final Index idxDailyActivitiesDate = Index(
     'idx_daily_activities_date',
     'CREATE INDEX idx_daily_activities_date ON daily_activities (date)',
+  );
+  late final Index idxDailyWaterEntriesDate = Index(
+    'idx_daily_water_entries_date',
+    'CREATE INDEX idx_daily_water_entries_date ON daily_water_entries (date)',
   );
   late final Index idxMealFoodsMealId = Index(
     'idx_meal_foods_meal_id',
@@ -6141,6 +6490,9 @@ abstract class _$AppDatabase extends GeneratedDatabase {
   late final DailyActivityDao dailyActivityDao = DailyActivityDao(
     this as AppDatabase,
   );
+  late final DailyWaterEntryDao dailyWaterEntryDao = DailyWaterEntryDao(
+    this as AppDatabase,
+  );
   late final ReactionDao reactionDao = ReactionDao(this as AppDatabase);
   late final StatisticsDao statisticsDao = StatisticsDao(this as AppDatabase);
   late final SettingsDao settingsDao = SettingsDao(this as AppDatabase);
@@ -6158,6 +6510,7 @@ abstract class _$AppDatabase extends GeneratedDatabase {
     dailyContexts,
     dailyMedications,
     dailyActivities,
+    dailyWaterEntries,
     mealFoods,
     symptoms,
     reactions,
@@ -6174,6 +6527,7 @@ abstract class _$AppDatabase extends GeneratedDatabase {
     uqDailyContextsDate,
     idxDailyMedicationsDate,
     idxDailyActivitiesDate,
+    idxDailyWaterEntriesDate,
     idxMealFoodsMealId,
     idxMealFoodsFoodId,
     uqMealFoodsMealFood,
@@ -8849,6 +9203,218 @@ typedef $$DailyActivitiesTableProcessedTableManager =
       DailyActivity,
       PrefetchHooks Function()
     >;
+typedef $$DailyWaterEntriesTableCreateCompanionBuilder =
+    DailyWaterEntriesCompanion Function({
+      Value<int> id,
+      required DateTime date,
+      required int amountMl,
+      Value<String?> notes,
+      required DateTime createdAt,
+    });
+typedef $$DailyWaterEntriesTableUpdateCompanionBuilder =
+    DailyWaterEntriesCompanion Function({
+      Value<int> id,
+      Value<DateTime> date,
+      Value<int> amountMl,
+      Value<String?> notes,
+      Value<DateTime> createdAt,
+    });
+
+class $$DailyWaterEntriesTableFilterComposer
+    extends Composer<_$AppDatabase, $DailyWaterEntriesTable> {
+  $$DailyWaterEntriesTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get date => $composableBuilder(
+    column: $table.date,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get amountMl => $composableBuilder(
+    column: $table.amountMl,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get notes => $composableBuilder(
+    column: $table.notes,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnFilters(column),
+  );
+}
+
+class $$DailyWaterEntriesTableOrderingComposer
+    extends Composer<_$AppDatabase, $DailyWaterEntriesTable> {
+  $$DailyWaterEntriesTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get date => $composableBuilder(
+    column: $table.date,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get amountMl => $composableBuilder(
+    column: $table.amountMl,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get notes => $composableBuilder(
+    column: $table.notes,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $$DailyWaterEntriesTableAnnotationComposer
+    extends Composer<_$AppDatabase, $DailyWaterEntriesTable> {
+  $$DailyWaterEntriesTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<int> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get date =>
+      $composableBuilder(column: $table.date, builder: (column) => column);
+
+  GeneratedColumn<int> get amountMl =>
+      $composableBuilder(column: $table.amountMl, builder: (column) => column);
+
+  GeneratedColumn<String> get notes =>
+      $composableBuilder(column: $table.notes, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get createdAt =>
+      $composableBuilder(column: $table.createdAt, builder: (column) => column);
+}
+
+class $$DailyWaterEntriesTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $DailyWaterEntriesTable,
+          DailyWaterEntry,
+          $$DailyWaterEntriesTableFilterComposer,
+          $$DailyWaterEntriesTableOrderingComposer,
+          $$DailyWaterEntriesTableAnnotationComposer,
+          $$DailyWaterEntriesTableCreateCompanionBuilder,
+          $$DailyWaterEntriesTableUpdateCompanionBuilder,
+          (
+            DailyWaterEntry,
+            BaseReferences<
+              _$AppDatabase,
+              $DailyWaterEntriesTable,
+              DailyWaterEntry
+            >,
+          ),
+          DailyWaterEntry,
+          PrefetchHooks Function()
+        > {
+  $$DailyWaterEntriesTableTableManager(
+    _$AppDatabase db,
+    $DailyWaterEntriesTable table,
+  ) : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$DailyWaterEntriesTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$DailyWaterEntriesTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$DailyWaterEntriesTableAnnotationComposer(
+                $db: db,
+                $table: table,
+              ),
+          updateCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                Value<DateTime> date = const Value.absent(),
+                Value<int> amountMl = const Value.absent(),
+                Value<String?> notes = const Value.absent(),
+                Value<DateTime> createdAt = const Value.absent(),
+              }) => DailyWaterEntriesCompanion(
+                id: id,
+                date: date,
+                amountMl: amountMl,
+                notes: notes,
+                createdAt: createdAt,
+              ),
+          createCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                required DateTime date,
+                required int amountMl,
+                Value<String?> notes = const Value.absent(),
+                required DateTime createdAt,
+              }) => DailyWaterEntriesCompanion.insert(
+                id: id,
+                date: date,
+                amountMl: amountMl,
+                notes: notes,
+                createdAt: createdAt,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable<$DailyWaterEntriesTable, DailyWaterEntry>(table),
+                  BaseReferences<
+                    _$AppDatabase,
+                    $DailyWaterEntriesTable,
+                    DailyWaterEntry
+                  >(db, table, e),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback: null,
+        ),
+      );
+}
+
+typedef $$DailyWaterEntriesTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $DailyWaterEntriesTable,
+      DailyWaterEntry,
+      $$DailyWaterEntriesTableFilterComposer,
+      $$DailyWaterEntriesTableOrderingComposer,
+      $$DailyWaterEntriesTableAnnotationComposer,
+      $$DailyWaterEntriesTableCreateCompanionBuilder,
+      $$DailyWaterEntriesTableUpdateCompanionBuilder,
+      (
+        DailyWaterEntry,
+        BaseReferences<_$AppDatabase, $DailyWaterEntriesTable, DailyWaterEntry>,
+      ),
+      DailyWaterEntry,
+      PrefetchHooks Function()
+    >;
 typedef $$MealFoodsTableCreateCompanionBuilder = MealFoodsCompanion Function({
   Value<int> id,
   required int mealId,
@@ -11109,6 +11675,8 @@ class $AppDatabaseManager {
       $$DailyMedicationsTableTableManager(_db, _db.dailyMedications);
   $$DailyActivitiesTableTableManager get dailyActivities =>
       $$DailyActivitiesTableTableManager(_db, _db.dailyActivities);
+  $$DailyWaterEntriesTableTableManager get dailyWaterEntries =>
+      $$DailyWaterEntriesTableTableManager(_db, _db.dailyWaterEntries);
   $$MealFoodsTableTableManager get mealFoods =>
       $$MealFoodsTableTableManager(_db, _db.mealFoods);
   $$SymptomsTableTableManager get symptoms =>

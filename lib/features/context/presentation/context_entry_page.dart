@@ -3,12 +3,14 @@ import 'package:flutter/material.dart';
 import '../domain/context_repository.dart';
 import '../domain/medication_repository.dart';
 import '../domain/activity_repository.dart';
+import '../domain/water_repository.dart';
 
 class ContextEntryPage extends StatefulWidget {
-  const ContextEntryPage({required this.repository, required this.medicationRepository, required this.activityRepository, required this.date, this.initial, super.key});
+  const ContextEntryPage({required this.repository, required this.medicationRepository, required this.activityRepository, required this.waterRepository, required this.date, this.initial, super.key});
   final ContextRepository repository;
   final MedicationRepository medicationRepository;
   final ActivityRepository activityRepository;
+  final WaterRepository waterRepository;
   final DateTime date;
   final DailyContextSummary? initial;
 
@@ -23,6 +25,7 @@ class _ContextEntryPageState extends State<ContextEntryPage> {
   int? _stress;
   late Future<List<DailyMedicationSummary>> _medications;
   late Future<List<DailyActivitySummary>> _activities;
+  late Future<List<WaterEntrySummary>> _waterEntries;
 
   @override
   void initState() {
@@ -34,6 +37,7 @@ class _ContextEntryPageState extends State<ContextEntryPage> {
     _notesController.text = initial?.notes ?? '';
     _medications = widget.medicationRepository.forDay(widget.date);
     _activities = widget.activityRepository.forDay(widget.date);
+    _waterEntries = widget.waterRepository.forDay(widget.date);
   }
 
   @override
@@ -103,6 +107,24 @@ class _ContextEntryPageState extends State<ContextEntryPage> {
     if (mounted) setState(() => _activities = widget.activityRepository.forDay(widget.date));
   }
 
+  Future<void> _addWater() async {
+    final amount = TextEditingController();
+    final notes = TextEditingController();
+    final saved = await showDialog<bool>(context: context, builder: (context) => AlertDialog(
+          title: const Text('Agregar agua'),
+          content: Column(mainAxisSize: MainAxisSize.min, children: [TextField(controller: amount, autofocus: true, keyboardType: TextInputType.number, decoration: const InputDecoration(labelText: 'Cantidad en ml', hintText: 'Ej. 250')), const SizedBox(height: 8), TextField(controller: notes, decoration: const InputDecoration(labelText: 'Notas (opcional)'))]),
+          actions: [TextButton(onPressed: () => Navigator.pop(context, false), child: const Text('Cancelar')), FilledButton(onPressed: () async { try { await widget.waterRepository.add(widget.date, int.tryParse(amount.text) ?? 0, notes.text); if (context.mounted) Navigator.pop(context, true); } on FormatException catch (error) { if (context.mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(error.message))); } }, child: const Text('Guardar'))],
+        ));
+    amount.dispose();
+    notes.dispose();
+    if (saved == true && mounted) setState(() => _waterEntries = widget.waterRepository.forDay(widget.date));
+  }
+
+  Future<void> _deleteWater(WaterEntrySummary entry) async {
+    await widget.waterRepository.delete(entry.id);
+    if (mounted) setState(() => _waterEntries = widget.waterRepository.forDay(widget.date));
+  }
+
   @override
   Widget build(BuildContext context) => Scaffold(
         appBar: AppBar(title: const Text('Contexto del día')),
@@ -149,6 +171,35 @@ class _ContextEntryPageState extends State<ContextEntryPage> {
                   subtitle: Text('${item.durationMinutes} min${item.intensity == null ? '' : ' · Intensidad ${item.intensity}'}'),
                   trailing: IconButton(onPressed: () => _deleteActivity(item), tooltip: 'Eliminar', icon: const Icon(Icons.delete_outline)),
                 )).toList(),
+              );
+            },
+          ),
+          const SizedBox(height: 18),
+          FutureBuilder<List<WaterEntrySummary>>(
+            future: _waterEntries,
+            builder: (context, snapshot) {
+              final entries = snapshot.data ?? const <WaterEntrySummary>[];
+              final total = entries.fold<int>(0, (sum, entry) => sum + entry.amountMl);
+              return Card(
+                child: Column(
+                  children: [
+                    ListTile(
+                      leading: const Icon(Icons.water_drop_outlined),
+                      title: const Text('Hidratación'),
+                      subtitle: Text('$total ml registrados'),
+                      trailing: IconButton(onPressed: _addWater, tooltip: 'Agregar agua', icon: const Icon(Icons.add)),
+                    ),
+                    ...entries.map((entry) {
+                      return ListTile(
+                        dense: true,
+                        contentPadding: const EdgeInsets.symmetric(horizontal: 16),
+                        title: Text('${entry.amountMl} ml'),
+                        subtitle: entry.notes == null ? null : Text(entry.notes!),
+                        trailing: IconButton(onPressed: () => _deleteWater(entry), tooltip: 'Eliminar', icon: const Icon(Icons.delete_outline)),
+                      );
+                    }),
+                  ],
+                ),
               );
             },
           ),

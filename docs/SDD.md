@@ -191,6 +191,12 @@ El contexto diario permite registrar medicamentos y suplementos con nombre, dosi
 
 Estado: implementado el registro y eliminación diaria; la integración con estadísticas queda para una etapa posterior.
 
+### Mejora 10: Hidratación Diaria
+
+El usuario podrá registrar varias tomas de agua por día en mililitros, agregar notas y eliminar tomas. Se mostrará el total diario en el contexto y los datos permanecerán locales.
+
+Estado: implementado el registro, total diario y eliminación; la integración con estadísticas queda para una etapa posterior.
+
 ### Mejora 09: Actividad Física
 
 El contexto diario permite registrar caminar, correr, bicicleta, gimnasio, deporte, estiramiento u otra actividad, junto con duración, intensidad y notas opcionales.

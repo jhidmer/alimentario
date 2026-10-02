@@ -17,6 +17,7 @@ import '../../context/data/context_repository_impl.dart';
 import '../../context/domain/context_repository.dart';
 import '../../context/data/medication_repository_impl.dart';
 import '../../context/data/activity_repository_impl.dart';
+import '../../context/data/water_repository_impl.dart';
 import '../../context/presentation/context_entry_page.dart';
 
 class DashboardPage extends StatefulWidget {
@@ -34,6 +35,7 @@ class _DashboardPageState extends State<DashboardPage> {
   late final ContextRepositoryImpl _context;
   late final MedicationRepositoryImpl _medications;
   late final ActivityRepositoryImpl _activities;
+  late final WaterRepositoryImpl _water;
   late final MealTemplateRepositoryImpl _templates;
   late Future<List<MealSummary>> _today;
   late Future<List<ReactionSummary>> _todayReactions;
@@ -48,6 +50,7 @@ class _DashboardPageState extends State<DashboardPage> {
     _context = ContextRepositoryImpl(appDatabase);
     _medications = MedicationRepositoryImpl(appDatabase);
     _activities = ActivityRepositoryImpl(appDatabase);
+    _water = WaterRepositoryImpl(appDatabase);
     _templates = MealTemplateRepositoryImpl(appDatabase);
     _load();
   }
@@ -61,7 +64,7 @@ class _DashboardPageState extends State<DashboardPage> {
     final date = DateTime.now();
     final current = await _context.forDay(date);
     if (!mounted) return;
-    final saved = await Navigator.of(context).push<bool>(MaterialPageRoute(builder: (_) => ContextEntryPage(repository: _context, medicationRepository: _medications, activityRepository: _activities, date: date, initial: current)));
+    final saved = await Navigator.of(context).push<bool>(MaterialPageRoute(builder: (_) => ContextEntryPage(repository: _context, medicationRepository: _medications, activityRepository: _activities, waterRepository: _water, date: date, initial: current)));
     if (saved == true && mounted) setState(_load);
   }
 
