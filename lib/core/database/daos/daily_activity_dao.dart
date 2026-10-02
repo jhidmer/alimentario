@@ -14,6 +14,8 @@ class DailyActivityDao extends DatabaseAccessor<AppDatabase> with _$DailyActivit
         ..orderBy([(activity) => OrderingTerm(expression: activity.activityType)]))
       .get();
 
+  Future<List<DailyActivity>> between(DateTime from, DateTime to) => (select(dailyActivities)..where((item) => item.date.isBetweenValues(from, to))).get();
+
   Future<int> insertActivity(DailyActivitiesCompanion entry) => into(dailyActivities).insert(entry);
 
   Future<void> deleteActivity(int id) => (delete(dailyActivities)..where((activity) => activity.id.equals(id))).go();

@@ -11,5 +11,7 @@ class DailyMoodDao extends DatabaseAccessor<AppDatabase> with _$DailyMoodDaoMixi
 
   Future<DailyMood?> forDay(DateTime day) => (select(dailyMoods)..where((mood) => mood.date.equals(DateTime(day.year, day.month, day.day)))).getSingleOrNull();
 
+  Future<List<DailyMood>> between(DateTime from, DateTime to) => (select(dailyMoods)..where((mood) => mood.date.isBetweenValues(from, to))).get();
+
   Future<void> save(DailyMoodsCompanion entry) => into(dailyMoods).insertOnConflictUpdate(entry);
 }

@@ -186,6 +186,16 @@ class _TrendsTab extends StatelessWidget {
       const SizedBox(height: 8),
       const Row(children: [_LegendDot(color: Colors.green, label: 'Comidas'), SizedBox(width: 16), _LegendDot(color: Colors.deepOrange, label: 'Reacciones')]),
       const SizedBox(height: 16),
+      Card(child: Column(children: [
+        const ListTile(leading: Icon(Icons.self_improvement), title: Text('Contexto del periodo')),
+        _ContextMetric(label: 'Sueño promedio', value: data.averageSleepMinutes == null ? 'Sin datos' : '${data.averageSleepMinutes!.toStringAsFixed(0)} min'),
+        _ContextMetric(label: 'Estrés promedio', value: data.averageStress?.toStringAsFixed(1) ?? 'Sin datos'),
+        _ContextMetric(label: 'Ánimo promedio', value: data.averageMood?.toStringAsFixed(1) ?? 'Sin datos'),
+        _ContextMetric(label: 'Actividad física', value: '${data.totalActivityMinutes} min'),
+        _ContextMetric(label: 'Hidratación', value: '${data.totalWaterMl} ml'),
+        _ContextMetric(label: 'Medicamentos y suplementos', value: '${data.medicationEntries} registros'),
+      ])),
+      const SizedBox(height: 20),
       ...data.trends.map((point) => Padding(
             padding: const EdgeInsets.only(bottom: 8),
             child: Row(children: [
@@ -199,6 +209,14 @@ class _TrendsTab extends StatelessWidget {
           )),
     ]);
   }
+}
+
+class _ContextMetric extends StatelessWidget {
+  const _ContextMetric({required this.label, required this.value});
+  final String label;
+  final String value;
+  @override
+  Widget build(BuildContext context) => ListTile(dense: true, title: Text(label), trailing: Text(value));
 }
 
 class _TrendBar extends StatelessWidget {

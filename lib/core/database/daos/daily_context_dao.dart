@@ -11,5 +11,7 @@ class DailyContextDao extends DatabaseAccessor<AppDatabase> with _$DailyContextD
 
   Future<DailyContext?> forDay(DateTime day) => (select(dailyContexts)..where((context) => context.date.equals(DateTime(day.year, day.month, day.day)))).getSingleOrNull();
 
+  Future<List<DailyContext>> between(DateTime from, DateTime to) => (select(dailyContexts)..where((context) => context.date.isBetweenValues(from, to))).get();
+
   Future<void> save(DailyContextsCompanion entry) => into(dailyContexts).insertOnConflictUpdate(entry);
 }

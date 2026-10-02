@@ -40,6 +40,12 @@ class StatisticsSnapshot {
     required this.commonHour,
     required this.commonBodyArea,
     required this.trends,
+    required this.averageSleepMinutes,
+    required this.averageStress,
+    required this.averageMood,
+    required this.totalActivityMinutes,
+    required this.totalWaterMl,
+    required this.medicationEntries,
   });
 
   final int registeredDays;
@@ -55,6 +61,12 @@ class StatisticsSnapshot {
   final int? commonHour;
   final String? commonBodyArea;
   final List<TrendPoint> trends;
+  final double? averageSleepMinutes;
+  final double? averageStress;
+  final double? averageMood;
+  final int totalActivityMinutes;
+  final int totalWaterMl;
+  final int medicationEntries;
 }
 
 abstract interface class StatisticsRepository {

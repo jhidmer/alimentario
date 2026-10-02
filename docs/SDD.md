@@ -203,6 +203,14 @@ El contexto diario permite registrar una escala de ánimo de 1 a 5 y notas opcio
 
 Estado: implementado el registro y edición diaria; la integración con tendencias queda para una etapa posterior.
 
+### Mejora 12: Contexto En Estadísticas
+
+Estadísticas y Tendencias incorporan los factores registrados durante el periodo: sueño promedio, estrés promedio, ánimo promedio, minutos de actividad, mililitros de hidratación y cantidad de medicamentos/suplementos.
+
+Estos indicadores son descriptivos y no implican causalidad.
+
+Estado: implementado en la pestaña Tendencias.
+
 ### Mejora 09: Actividad Física
 
 El contexto diario permite registrar caminar, correr, bicicleta, gimnasio, deporte, estiramiento u otra actividad, junto con duración, intensidad y notas opcionales.

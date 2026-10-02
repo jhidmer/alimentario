@@ -14,6 +14,8 @@ class DailyMedicationDao extends DatabaseAccessor<AppDatabase> with _$DailyMedic
         ..orderBy([(item) => OrderingTerm(expression: item.name)]))
       .get();
 
+  Future<List<DailyMedication>> between(DateTime from, DateTime to) => (select(dailyMedications)..where((item) => item.date.isBetweenValues(from, to))).get();
+
   Future<int> insertItem(DailyMedicationsCompanion entry) => into(dailyMedications).insert(entry);
 
   Future<void> deleteItem(int id) => (delete(dailyMedications)..where((item) => item.id.equals(id))).go();

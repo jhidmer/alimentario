@@ -22,6 +22,11 @@ class StatisticsRepositoryImpl implements StatisticsRepository {
   Future<StatisticsSnapshot> snapshot(StatisticsPeriod period) async {
     final meals = await _database.mealDao.between(period.from, period.to);
     final reactions = await _database.reactionDao.between(period.from, period.to);
+    final contexts = await _database.dailyContextDao.between(period.from, period.to);
+    final activities = await _database.dailyActivityDao.between(period.from, period.to);
+    final waterEntries = await _database.dailyWaterEntryDao.between(period.from, period.to);
+    final moods = await _database.dailyMoodDao.between(period.from, period.to);
+    final medicationEntries = (await _database.dailyMedicationDao.between(period.from, period.to)).length;
     final mealDays = <DateTime>{};
     final reactionDays = <DateTime>{};
     final foodCounts = <String, int>{};
@@ -45,6 +50,9 @@ class StatisticsRepositoryImpl implements StatisticsRepository {
     }
 
     final symptomCounts = <String, int>{};
+    final sleepValues = contexts.where((value) => value.sleepMinutes != null).map((value) => value.sleepMinutes!).toList();
+    final stressValues = contexts.where((value) => value.stress != null).map((value) => value.stress!).toList();
+    final moodValues = moods.map((value) => value.mood).toList();
     var intensityTotal = 0;
     var durationTotal = 0;
     var durationCount = 0;
@@ -81,6 +89,12 @@ class StatisticsRepositoryImpl implements StatisticsRepository {
       commonHour: _mostCommon(hours),
       commonBodyArea: _mostCommonKey(bodyAreas),
       trends: _buildTrends(period, trendMeals, trendReactions),
+      averageSleepMinutes: _average(sleepValues),
+      averageStress: _average(stressValues),
+      averageMood: _average(moodValues),
+      totalActivityMinutes: activities.fold(0, (sum, item) => sum + item.durationMinutes),
+      totalWaterMl: waterEntries.fold(0, (sum, item) => sum + item.amountMl),
+      medicationEntries: medicationEntries,
     );
   }
 
@@ -93,6 +107,7 @@ class StatisticsRepositoryImpl implements StatisticsRepository {
   DateTime _day(DateTime value) => DateTime(value.year, value.month, value.day);
   int? _mostCommon(Map<int, int> values) => values.isEmpty ? null : (values.entries.toList()..sort((a, b) => b.value.compareTo(a.value))).first.key;
   String? _mostCommonKey(Map<String, int> values) => values.isEmpty ? null : (values.entries.toList()..sort((a, b) => b.value.compareTo(a.value))).first.key;
+  double? _average(List<int> values) => values.isEmpty ? null : values.reduce((a, b) => a + b) / values.length;
 
   List<TrendPoint> _buildTrends(StatisticsPeriod period, Map<DateTime, int> meals, Map<DateTime, int> reactions) {
     final from = _day(period.from);
