@@ -2,11 +2,13 @@ import 'package:flutter/material.dart';
 
 import '../domain/context_repository.dart';
 import '../domain/medication_repository.dart';
+import '../domain/activity_repository.dart';
 
 class ContextEntryPage extends StatefulWidget {
-  const ContextEntryPage({required this.repository, required this.medicationRepository, required this.date, this.initial, super.key});
+  const ContextEntryPage({required this.repository, required this.medicationRepository, required this.activityRepository, required this.date, this.initial, super.key});
   final ContextRepository repository;
   final MedicationRepository medicationRepository;
+  final ActivityRepository activityRepository;
   final DateTime date;
   final DailyContextSummary? initial;
 
@@ -20,6 +22,7 @@ class _ContextEntryPageState extends State<ContextEntryPage> {
   int? _sleepQuality;
   int? _stress;
   late Future<List<DailyMedicationSummary>> _medications;
+  late Future<List<DailyActivitySummary>> _activities;
 
   @override
   void initState() {
@@ -30,6 +33,7 @@ class _ContextEntryPageState extends State<ContextEntryPage> {
     _stress = initial?.stress;
     _notesController.text = initial?.notes ?? '';
     _medications = widget.medicationRepository.forDay(widget.date);
+    _activities = widget.activityRepository.forDay(widget.date);
   }
 
   @override
@@ -71,6 +75,34 @@ class _ContextEntryPageState extends State<ContextEntryPage> {
     if (mounted) setState(() => _medications = widget.medicationRepository.forDay(widget.date));
   }
 
+  Future<void> _addActivity() async {
+    final duration = TextEditingController();
+    final notes = TextEditingController();
+    var type = 'Caminar';
+    int? intensity;
+    final saved = await showDialog<bool>(context: context, builder: (context) => StatefulBuilder(builder: (context, setDialogState) => AlertDialog(
+          title: const Text('Agregar actividad física'),
+          content: Column(mainAxisSize: MainAxisSize.min, children: [
+            DropdownButtonFormField<String>(initialValue: type, decoration: const InputDecoration(labelText: 'Actividad'), items: const ['Caminar', 'Correr', 'Bicicleta', 'Gimnasio', 'Deporte', 'Estiramiento', 'Otra'].map((value) => DropdownMenuItem(value: value, child: Text(value))).toList(), onChanged: (value) => setDialogState(() => type = value ?? type)),
+            const SizedBox(height: 8),
+            TextField(controller: duration, keyboardType: TextInputType.number, decoration: const InputDecoration(labelText: 'Duración (minutos)')),
+            const SizedBox(height: 8),
+            SegmentedButton<int>(segments: const [ButtonSegment(value: 1, label: Text('Baja')), ButtonSegment(value: 2, label: Text('Media')), ButtonSegment(value: 3, label: Text('Alta'))], selected: intensity == null ? {} : {intensity!}, onSelectionChanged: (value) => setDialogState(() => intensity = value.first)),
+            const SizedBox(height: 8),
+            TextField(controller: notes, decoration: const InputDecoration(labelText: 'Notas (opcional)')),
+          ]),
+          actions: [TextButton(onPressed: () => Navigator.pop(context, false), child: const Text('Cancelar')), FilledButton(onPressed: () async { try { await widget.activityRepository.add(widget.date, type, int.tryParse(duration.text) ?? 0, intensity, notes.text); if (context.mounted) Navigator.pop(context, true); } on FormatException catch (error) { if (context.mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(error.message))); } }, child: const Text('Guardar'))],
+        )));
+    duration.dispose();
+    notes.dispose();
+    if (saved == true && mounted) setState(() => _activities = widget.activityRepository.forDay(widget.date));
+  }
+
+  Future<void> _deleteActivity(DailyActivitySummary item) async {
+    await widget.activityRepository.delete(item.id);
+    if (mounted) setState(() => _activities = widget.activityRepository.forDay(widget.date));
+  }
+
   @override
   Widget build(BuildContext context) => Scaffold(
         appBar: AppBar(title: const Text('Contexto del día')),
@@ -99,6 +131,23 @@ class _ContextEntryPageState extends State<ContextEntryPage> {
                   title: Text(item.name),
                   subtitle: Text(item.dosage == null ? (item.kind == 'supplement' ? 'Suplemento' : 'Medicamento') : '${item.dosage} ${item.unit ?? ''}'),
                   trailing: IconButton(onPressed: () => _deleteMedication(item), tooltip: 'Eliminar', icon: const Icon(Icons.delete_outline)),
+                )).toList(),
+              );
+            },
+          ),
+          const SizedBox(height: 18),
+          Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [Text('Actividad física', style: Theme.of(context).textTheme.titleMedium), IconButton(onPressed: _addActivity, tooltip: 'Agregar', icon: const Icon(Icons.add))]),
+          FutureBuilder<List<DailyActivitySummary>>(
+            future: _activities,
+            builder: (context, snapshot) {
+              if (!snapshot.hasData) return const LinearProgressIndicator();
+              return Column(
+                children: snapshot.data!.map((item) => ListTile(
+                  contentPadding: EdgeInsets.zero,
+                  leading: const Icon(Icons.directions_walk),
+                  title: Text(item.activityType),
+                  subtitle: Text('${item.durationMinutes} min${item.intensity == null ? '' : ' · Intensidad ${item.intensity}'}'),
+                  trailing: IconButton(onPressed: () => _deleteActivity(item), tooltip: 'Eliminar', icon: const Icon(Icons.delete_outline)),
                 )).toList(),
               );
             },

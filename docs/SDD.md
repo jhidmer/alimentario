@@ -191,6 +191,12 @@ El contexto diario permite registrar medicamentos y suplementos con nombre, dosi
 
 Estado: implementado el registro y eliminación diaria; la integración con estadísticas queda para una etapa posterior.
 
+### Mejora 09: Actividad Física
+
+El contexto diario permite registrar caminar, correr, bicicleta, gimnasio, deporte, estiramiento u otra actividad, junto con duración, intensidad y notas opcionales.
+
+Estado: implementado el registro y eliminación diaria; la integración con estadísticas queda para una etapa posterior.
+
 ### Mejora 05: Confianza Estadística
 
 Los patrones mostrarán siempre el tamaño de muestra y no solo el porcentaje. Se aplicarán estas etiquetas orientativas:
