@@ -453,6 +453,17 @@ class $FoodsTable extends Foods with TableInfo<$FoodsTable, Food> {
     type: DriftSqlType.string,
     requiredDuringInsert: true,
   );
+  static const VerificationMeta _barcodeMeta = const VerificationMeta(
+    'barcode',
+  );
+  @override
+  late final GeneratedColumn<String> barcode = GeneratedColumn<String>(
+    'barcode',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
   static const VerificationMeta _usageCountMeta = const VerificationMeta(
     'usageCount',
   );
@@ -519,6 +530,7 @@ class $FoodsTable extends Foods with TableInfo<$FoodsTable, Food> {
     categoryId,
     name,
     normalizedName,
+    barcode,
     usageCount,
     lastUsedAt,
     isActive,
@@ -566,6 +578,12 @@ class $FoodsTable extends Foods with TableInfo<$FoodsTable, Food> {
       );
     } else if (isInserting) {
       context.missing(_normalizedNameMeta);
+    }
+    if (data.containsKey('barcode')) {
+      context.handle(
+        _barcodeMeta,
+        barcode.isAcceptableOrUnknown(data['barcode']!, _barcodeMeta),
+      );
     }
     if (data.containsKey('usage_count')) {
       context.handle(
@@ -629,6 +647,10 @@ class $FoodsTable extends Foods with TableInfo<$FoodsTable, Food> {
         DriftSqlType.string,
         data['${effectivePrefix}normalized_name'],
       )!,
+      barcode: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}barcode'],
+      ),
       usageCount: attachedDatabase.typeMapping.read(
         DriftSqlType.int,
         data['${effectivePrefix}usage_count'],
@@ -663,6 +685,7 @@ class Food extends DataClass implements Insertable<Food> {
   final int categoryId;
   final String name;
   final String normalizedName;
+  final String? barcode;
   final int usageCount;
   final DateTime? lastUsedAt;
   final bool isActive;
@@ -673,6 +696,7 @@ class Food extends DataClass implements Insertable<Food> {
     required this.categoryId,
     required this.name,
     required this.normalizedName,
+    this.barcode,
     required this.usageCount,
     this.lastUsedAt,
     required this.isActive,
@@ -686,6 +710,9 @@ class Food extends DataClass implements Insertable<Food> {
     map['category_id'] = Variable<int>(categoryId);
     map['name'] = Variable<String>(name);
     map['normalized_name'] = Variable<String>(normalizedName);
+    if (!nullToAbsent || barcode != null) {
+      map['barcode'] = Variable<String>(barcode);
+    }
     map['usage_count'] = Variable<int>(usageCount);
     if (!nullToAbsent || lastUsedAt != null) {
       map['last_used_at'] = Variable<DateTime>(lastUsedAt);
@@ -702,6 +729,9 @@ class Food extends DataClass implements Insertable<Food> {
       categoryId: Value(categoryId),
       name: Value(name),
       normalizedName: Value(normalizedName),
+      barcode: barcode == null && nullToAbsent
+          ? const Value.absent()
+          : Value(barcode),
       usageCount: Value(usageCount),
       lastUsedAt: lastUsedAt == null && nullToAbsent
           ? const Value.absent()
@@ -722,6 +752,7 @@ class Food extends DataClass implements Insertable<Food> {
       categoryId: serializer.fromJson<int>(json['categoryId']),
       name: serializer.fromJson<String>(json['name']),
       normalizedName: serializer.fromJson<String>(json['normalizedName']),
+      barcode: serializer.fromJson<String?>(json['barcode']),
       usageCount: serializer.fromJson<int>(json['usageCount']),
       lastUsedAt: serializer.fromJson<DateTime?>(json['lastUsedAt']),
       isActive: serializer.fromJson<bool>(json['isActive']),
@@ -737,6 +768,7 @@ class Food extends DataClass implements Insertable<Food> {
       'categoryId': serializer.toJson<int>(categoryId),
       'name': serializer.toJson<String>(name),
       'normalizedName': serializer.toJson<String>(normalizedName),
+      'barcode': serializer.toJson<String?>(barcode),
       'usageCount': serializer.toJson<int>(usageCount),
       'lastUsedAt': serializer.toJson<DateTime?>(lastUsedAt),
       'isActive': serializer.toJson<bool>(isActive),
@@ -750,6 +782,7 @@ class Food extends DataClass implements Insertable<Food> {
     int? categoryId,
     String? name,
     String? normalizedName,
+    Value<String?> barcode = const Value.absent(),
     int? usageCount,
     Value<DateTime?> lastUsedAt = const Value.absent(),
     bool? isActive,
@@ -760,6 +793,7 @@ class Food extends DataClass implements Insertable<Food> {
     categoryId: categoryId ?? this.categoryId,
     name: name ?? this.name,
     normalizedName: normalizedName ?? this.normalizedName,
+    barcode: barcode.present ? barcode.value : this.barcode,
     usageCount: usageCount ?? this.usageCount,
     lastUsedAt: lastUsedAt.present ? lastUsedAt.value : this.lastUsedAt,
     isActive: isActive ?? this.isActive,
@@ -776,6 +810,7 @@ class Food extends DataClass implements Insertable<Food> {
       normalizedName: data.normalizedName.present
           ? data.normalizedName.value
           : this.normalizedName,
+      barcode: data.barcode.present ? data.barcode.value : this.barcode,
       usageCount: data.usageCount.present
           ? data.usageCount.value
           : this.usageCount,
@@ -795,6 +830,7 @@ class Food extends DataClass implements Insertable<Food> {
           ..write('categoryId: $categoryId, ')
           ..write('name: $name, ')
           ..write('normalizedName: $normalizedName, ')
+          ..write('barcode: $barcode, ')
           ..write('usageCount: $usageCount, ')
           ..write('lastUsedAt: $lastUsedAt, ')
           ..write('isActive: $isActive, ')
@@ -810,6 +846,7 @@ class Food extends DataClass implements Insertable<Food> {
     categoryId,
     name,
     normalizedName,
+    barcode,
     usageCount,
     lastUsedAt,
     isActive,
@@ -824,6 +861,7 @@ class Food extends DataClass implements Insertable<Food> {
           other.categoryId == this.categoryId &&
           other.name == this.name &&
           other.normalizedName == this.normalizedName &&
+          other.barcode == this.barcode &&
           other.usageCount == this.usageCount &&
           other.lastUsedAt == this.lastUsedAt &&
           other.isActive == this.isActive &&
@@ -836,6 +874,7 @@ class FoodsCompanion extends UpdateCompanion<Food> {
   final Value<int> categoryId;
   final Value<String> name;
   final Value<String> normalizedName;
+  final Value<String?> barcode;
   final Value<int> usageCount;
   final Value<DateTime?> lastUsedAt;
   final Value<bool> isActive;
@@ -846,6 +885,7 @@ class FoodsCompanion extends UpdateCompanion<Food> {
     this.categoryId = const Value.absent(),
     this.name = const Value.absent(),
     this.normalizedName = const Value.absent(),
+    this.barcode = const Value.absent(),
     this.usageCount = const Value.absent(),
     this.lastUsedAt = const Value.absent(),
     this.isActive = const Value.absent(),
@@ -857,6 +897,7 @@ class FoodsCompanion extends UpdateCompanion<Food> {
     required int categoryId,
     required String name,
     required String normalizedName,
+    this.barcode = const Value.absent(),
     this.usageCount = const Value.absent(),
     this.lastUsedAt = const Value.absent(),
     this.isActive = const Value.absent(),
@@ -872,6 +913,7 @@ class FoodsCompanion extends UpdateCompanion<Food> {
     Expression<int>? categoryId,
     Expression<String>? name,
     Expression<String>? normalizedName,
+    Expression<String>? barcode,
     Expression<int>? usageCount,
     Expression<DateTime>? lastUsedAt,
     Expression<bool>? isActive,
@@ -883,6 +925,7 @@ class FoodsCompanion extends UpdateCompanion<Food> {
       if (categoryId != null) 'category_id': categoryId,
       if (name != null) 'name': name,
       if (normalizedName != null) 'normalized_name': normalizedName,
+      if (barcode != null) 'barcode': barcode,
       if (usageCount != null) 'usage_count': usageCount,
       if (lastUsedAt != null) 'last_used_at': lastUsedAt,
       if (isActive != null) 'is_active': isActive,
@@ -896,6 +939,7 @@ class FoodsCompanion extends UpdateCompanion<Food> {
     Value<int>? categoryId,
     Value<String>? name,
     Value<String>? normalizedName,
+    Value<String?>? barcode,
     Value<int>? usageCount,
     Value<DateTime?>? lastUsedAt,
     Value<bool>? isActive,
@@ -907,6 +951,7 @@ class FoodsCompanion extends UpdateCompanion<Food> {
       categoryId: categoryId ?? this.categoryId,
       name: name ?? this.name,
       normalizedName: normalizedName ?? this.normalizedName,
+      barcode: barcode ?? this.barcode,
       usageCount: usageCount ?? this.usageCount,
       lastUsedAt: lastUsedAt ?? this.lastUsedAt,
       isActive: isActive ?? this.isActive,
@@ -929,6 +974,9 @@ class FoodsCompanion extends UpdateCompanion<Food> {
     }
     if (normalizedName.present) {
       map['normalized_name'] = Variable<String>(normalizedName.value);
+    }
+    if (barcode.present) {
+      map['barcode'] = Variable<String>(barcode.value);
     }
     if (usageCount.present) {
       map['usage_count'] = Variable<int>(usageCount.value);
@@ -955,6 +1003,7 @@ class FoodsCompanion extends UpdateCompanion<Food> {
           ..write('categoryId: $categoryId, ')
           ..write('name: $name, ')
           ..write('normalizedName: $normalizedName, ')
+          ..write('barcode: $barcode, ')
           ..write('usageCount: $usageCount, ')
           ..write('lastUsedAt: $lastUsedAt, ')
           ..write('isActive: $isActive, ')
@@ -6757,6 +6806,10 @@ abstract class _$AppDatabase extends GeneratedDatabase {
     'idx_foods_last_used_at',
     'CREATE INDEX idx_foods_last_used_at ON foods (last_used_at)',
   );
+  late final Index uqFoodsBarcode = Index(
+    'uq_foods_barcode',
+    'CREATE UNIQUE INDEX uq_foods_barcode ON foods (barcode)',
+  );
   late final Index idxMealsMealDatetime = Index(
     'idx_meals_meal_datetime',
     'CREATE INDEX idx_meals_meal_datetime ON meals (meal_datetime)',
@@ -6869,6 +6922,7 @@ abstract class _$AppDatabase extends GeneratedDatabase {
     idxFoodsNormalizedName,
     idxFoodsUsageCount,
     idxFoodsLastUsedAt,
+    uqFoodsBarcode,
     idxMealsMealDatetime,
     idxMealsMealType,
     uqMealTemplateFoodsTemplateFood,
@@ -7198,6 +7252,7 @@ typedef $$FoodsTableCreateCompanionBuilder = FoodsCompanion Function({
   required int categoryId,
   required String name,
   required String normalizedName,
+  Value<String?> barcode,
   Value<int> usageCount,
   Value<DateTime?> lastUsedAt,
   Value<bool> isActive,
@@ -7209,6 +7264,7 @@ typedef $$FoodsTableUpdateCompanionBuilder = FoodsCompanion Function({
   Value<int> categoryId,
   Value<String> name,
   Value<String> normalizedName,
+  Value<String?> barcode,
   Value<int> usageCount,
   Value<DateTime?> lastUsedAt,
   Value<bool> isActive,
@@ -7297,6 +7353,11 @@ class $$FoodsTableFilterComposer extends Composer<_$AppDatabase, $FoodsTable> {
 
   ColumnFilters<String> get normalizedName => $composableBuilder(
     column: $table.normalizedName,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get barcode => $composableBuilder(
+    column: $table.barcode,
     builder: (column) => ColumnFilters(column),
   );
 
@@ -7423,6 +7484,11 @@ class $$FoodsTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
+  ColumnOrderings<String> get barcode => $composableBuilder(
+    column: $table.barcode,
+    builder: (column) => ColumnOrderings(column),
+  );
+
   ColumnOrderings<int> get usageCount => $composableBuilder(
     column: $table.usageCount,
     builder: (column) => ColumnOrderings(column),
@@ -7491,6 +7557,9 @@ class $$FoodsTableAnnotationComposer
     column: $table.normalizedName,
     builder: (column) => column,
   );
+
+  GeneratedColumn<String> get barcode =>
+      $composableBuilder(column: $table.barcode, builder: (column) => column);
 
   GeneratedColumn<int> get usageCount => $composableBuilder(
     column: $table.usageCount,
@@ -7622,6 +7691,7 @@ class $$FoodsTableTableManager
                 Value<int> categoryId = const Value.absent(),
                 Value<String> name = const Value.absent(),
                 Value<String> normalizedName = const Value.absent(),
+                Value<String?> barcode = const Value.absent(),
                 Value<int> usageCount = const Value.absent(),
                 Value<DateTime?> lastUsedAt = const Value.absent(),
                 Value<bool> isActive = const Value.absent(),
@@ -7632,6 +7702,7 @@ class $$FoodsTableTableManager
                 categoryId: categoryId,
                 name: name,
                 normalizedName: normalizedName,
+                barcode: barcode,
                 usageCount: usageCount,
                 lastUsedAt: lastUsedAt,
                 isActive: isActive,
@@ -7644,6 +7715,7 @@ class $$FoodsTableTableManager
                 required int categoryId,
                 required String name,
                 required String normalizedName,
+                Value<String?> barcode = const Value.absent(),
                 Value<int> usageCount = const Value.absent(),
                 Value<DateTime?> lastUsedAt = const Value.absent(),
                 Value<bool> isActive = const Value.absent(),
@@ -7654,6 +7726,7 @@ class $$FoodsTableTableManager
                 categoryId: categoryId,
                 name: name,
                 normalizedName: normalizedName,
+                barcode: barcode,
                 usageCount: usageCount,
                 lastUsedAt: lastUsedAt,
                 isActive: isActive,

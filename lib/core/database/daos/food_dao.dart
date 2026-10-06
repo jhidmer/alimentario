@@ -29,6 +29,8 @@ class FoodDao extends DatabaseAccessor<AppDatabase> with _$FoodDaoMixin {
 
   Future<Food?> findById(int id) => (select(foods)..where((food) => food.id.equals(id))).getSingleOrNull();
 
+  Future<Food?> findByBarcode(String barcode) => (select(foods)..where((food) => food.barcode.equals(barcode))).getSingleOrNull();
+
   Future<int> insertFood(FoodsCompanion entry) => into(foods).insert(entry);
 
   Future<void> deactivate(int id) => (update(foods)..where((food) => food.id.equals(id))).write(const FoodsCompanion(isActive: Value(false)));

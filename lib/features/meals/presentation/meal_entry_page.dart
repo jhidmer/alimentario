@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../foods/domain/food_repository.dart';
 import '../../foods/data/category_repository.dart';
+import '../../foods/presentation/barcode_scanner_page.dart';
 import '../data/meal_repository_impl.dart';
 import '../data/meal_template_repository_impl.dart';
 import '../domain/meal_repository.dart';
@@ -132,6 +133,25 @@ class _MealEntryPageState extends State<MealEntryPage> {
     });
   }
 
+  Future<void> _scanBarcode() async {
+    final barcode = await Navigator.of(context).push<String>(MaterialPageRoute(builder: (_) => const BarcodeScannerPage()));
+    if (barcode == null || !mounted) return;
+    final existing = await widget.foodRepository.findByBarcode(barcode);
+    if (!mounted) return;
+    if (existing != null) {
+      _toggleFood(existing.id, true);
+      _showMessage('${existing.name} seleccionado.');
+      return;
+    }
+    final food = await showModalBottomSheet<FoodSummary>(
+      context: context,
+      isScrollControlled: true,
+      showDragHandle: true,
+      builder: (_) => _QuickAddFoodSheet(foodRepository: widget.foodRepository, categoryRepository: widget.categoryRepository, barcode: barcode),
+    );
+    if (food != null && mounted) _toggleFood(food.id, true);
+  }
+
   Future<void> _pickDate() async {
     final date = await showDatePicker(
       context: context,
@@ -202,6 +222,7 @@ class _MealEntryPageState extends State<MealEntryPage> {
           ),
           const SizedBox(height: 8),
           OutlinedButton.icon(onPressed: _chooseTemplate, icon: const Icon(Icons.bookmark_outline), label: const Text('Usar comida habitual')),
+          OutlinedButton.icon(onPressed: _scanBarcode, icon: const Icon(Icons.qr_code_scanner), label: const Text('Escanear código')),
           const SizedBox(height: 8),
           Align(
             alignment: Alignment.centerLeft,
@@ -267,10 +288,11 @@ class _MealEntryPageState extends State<MealEntryPage> {
 }
 
 class _QuickAddFoodSheet extends StatefulWidget {
-  const _QuickAddFoodSheet({required this.foodRepository, required this.categoryRepository});
+  const _QuickAddFoodSheet({required this.foodRepository, required this.categoryRepository, this.barcode});
 
   final FoodRepository foodRepository;
   final CategoryRepository categoryRepository;
+  final String? barcode;
 
   @override
   State<_QuickAddFoodSheet> createState() => _QuickAddFoodSheetState();
@@ -301,7 +323,7 @@ class _QuickAddFoodSheetState extends State<_QuickAddFoodSheet> {
     }
     setState(() => _saving = true);
     try {
-      final food = await widget.foodRepository.create(FoodDraft(name: _nameController.text, categoryId: _categoryId!));
+      final food = await widget.foodRepository.create(FoodDraft(name: _nameController.text, categoryId: _categoryId!, barcode: widget.barcode));
       if (mounted) Navigator.pop(context, food);
     } on FormatException catch (error) {
       if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(error.message)));

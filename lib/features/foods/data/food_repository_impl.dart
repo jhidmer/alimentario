@@ -1,3 +1,5 @@
+import 'package:drift/drift.dart';
+
 import '../../../core/database/app_database.dart';
 import '../domain/food_repository.dart';
 
@@ -37,6 +39,10 @@ class FoodRepositoryImpl implements FoodRepository {
     if (await _database.foodDao.findByNormalizedName(normalizedName) != null) {
       throw const FormatException('Ya existe un alimento con ese nombre.');
     }
+    final barcode = draft.barcode?.trim();
+    if (barcode != null && barcode.isNotEmpty && await _database.foodDao.findByBarcode(barcode) != null) {
+      throw const FormatException('Ya existe un alimento con ese código.');
+    }
 
     final now = DateTime.now();
     final id = await _database.foodDao.insertFood(
@@ -44,6 +50,7 @@ class FoodRepositoryImpl implements FoodRepository {
         categoryId: draft.categoryId,
         name: name,
         normalizedName: normalizedName,
+        barcode: Value(barcode?.isEmpty == true ? null : barcode),
         createdAt: now,
         updatedAt: now,
       ),
@@ -58,7 +65,13 @@ class FoodRepositoryImpl implements FoodRepository {
   @override
   Future<void> deactivate(int foodId) => _database.foodDao.deactivate(foodId);
 
-  FoodSummary _toSummary(Food food) => FoodSummary(id: food.id, name: food.name, categoryId: food.categoryId);
+  FoodSummary _toSummary(Food food) => FoodSummary(id: food.id, name: food.name, categoryId: food.categoryId, barcode: food.barcode);
+
+  @override
+  Future<FoodSummary?> findByBarcode(String barcode) async {
+    final food = await _database.foodDao.findByBarcode(barcode);
+    return food == null ? null : _toSummary(food);
+  }
 }
 
 String normalizeFoodName(String value) {

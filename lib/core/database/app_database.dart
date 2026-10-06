@@ -81,7 +81,7 @@ class AppDatabase extends _$AppDatabase {
   }
 
   @override
-  int get schemaVersion => 8;
+  int get schemaVersion => 9;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -100,6 +100,10 @@ class AppDatabase extends _$AppDatabase {
           if (from < 6) await m.createTable(dailyActivities);
           if (from < 7) await m.createTable(dailyWaterEntries);
           if (from < 8) await m.createTable(dailyMoods);
+          if (from < 9) {
+            await m.addColumn(foods, foods.barcode);
+            await customStatement('CREATE UNIQUE INDEX IF NOT EXISTS uq_foods_barcode ON foods (barcode)');
+          }
         },
         beforeOpen: (details) async {
           await customStatement('PRAGMA foreign_keys = ON');
@@ -128,7 +132,7 @@ class AppDatabase extends _$AppDatabase {
         CategoriesCompanion.insert(name: 'Snacks', isDefault: const Value(true), createdAt: now),
         CategoriesCompanion.insert(name: 'Otros', isDefault: const Value(true), createdAt: now),
       ]);
-      batch.insert(schemaMetadata, SchemaMetadataCompanion.insert(key: 'database_version', value: const Value('8')));
+      batch.insert(schemaMetadata, SchemaMetadataCompanion.insert(key: 'database_version', value: const Value('9')));
       batch.insertAll(symptoms, _defaultSymptoms(now));
     });
     await _ensureDefaultFoods();
@@ -182,7 +186,7 @@ class AppDatabase extends _$AppDatabase {
       await delete(foods).go();
       await delete(appSettings).go();
       await delete(schemaMetadata).go();
-      await into(schemaMetadata).insert(SchemaMetadataCompanion.insert(key: 'database_version', value: const Value('8')));
+      await into(schemaMetadata).insert(SchemaMetadataCompanion.insert(key: 'database_version', value: const Value('9')));
     });
     for (final photo in photos) {
       final file = File(photo.filePath);

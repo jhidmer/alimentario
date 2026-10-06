@@ -13,6 +13,9 @@ void main() {
     await tester.pumpWidget(MaterialApp(home: MealEntryPage(type: MealType.breakfast, foodRepository: _FakeFoodRepository(), categoryRepository: _FakeCategoryRepository(), mealRepository: meals, templateRepository: _FakeTemplateRepository())));
     await tester.pump();
     await tester.tap(find.text('Pan'));
+    await tester.pump();
+    await tester.drag(find.byType(ListView), const Offset(0, -800));
+    await tester.pump();
     await tester.tap(find.text('Guardar comida'));
     await tester.pump();
 
@@ -32,6 +35,9 @@ class _FakeCategoryRepository implements CategoryRepository {
 }
 
 class _FakeFoodRepository implements FoodRepository {
+  @override
+  Future<FoodSummary?> findByBarcode(String barcode) async => null;
+
   @override
   Future<FoodSummary> create(FoodDraft draft) async => const FoodSummary(id: 2, name: 'Nuevo', categoryId: 1);
 

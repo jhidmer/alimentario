@@ -189,19 +189,19 @@ Estado: persistencia local y registro diario implementados desde Hoy.
 
 El contexto diario permite registrar medicamentos y suplementos con nombre, dosis, unidad y notas opcionales. Estos registros son locales y descriptivos; la aplicación no recomienda dosis ni tratamientos.
 
-Estado: implementado el registro y eliminación diaria; la integración con estadísticas queda para una etapa posterior.
+Estado: implementado el registro y eliminación diaria; integrado en Estadísticas desde la Mejora 12.
 
 ### Mejora 10: Hidratación Diaria
 
 El usuario podrá registrar varias tomas de agua por día en mililitros, agregar notas y eliminar tomas. Se mostrará el total diario en el contexto y los datos permanecerán locales.
 
-Estado: implementado el registro, total diario y eliminación; la integración con estadísticas queda para una etapa posterior.
+Estado: implementado el registro, total diario y eliminación; integrado en Estadísticas desde la Mejora 12.
 
 ### Mejora 11: Estado De Ánimo
 
 El contexto diario permite registrar una escala de ánimo de 1 a 5 y notas opcionales. El registro es local y descriptivo; no representa una evaluación psicológica ni médica.
 
-Estado: implementado el registro y edición diaria; la integración con tendencias queda para una etapa posterior.
+Estado: implementado el registro y edición diaria; integrado en Estadísticas desde la Mejora 12.
 
 ### Mejora 12: Contexto En Estadísticas
 
@@ -211,11 +211,17 @@ Estos indicadores son descriptivos y no implican causalidad.
 
 Estado: implementado en la pestaña Tendencias.
 
+### Mejora 13: Escáner De Código De Barras
+
+El formulario de comidas incluye un botón para escanear códigos con la cámara. Si el código ya está asociado a un alimento local, se selecciona automáticamente; si no existe, se ofrece crearlo rápidamente conservando el código. El procesamiento es local y no se consulta información nutricional externa.
+
+Estado: implementado con permiso de cámara y asociación local de códigos.
+
 ### Mejora 09: Actividad Física
 
 El contexto diario permite registrar caminar, correr, bicicleta, gimnasio, deporte, estiramiento u otra actividad, junto con duración, intensidad y notas opcionales.
 
-Estado: implementado el registro y eliminación diaria; la integración con estadísticas queda para una etapa posterior.
+Estado: implementado el registro y eliminación diaria; integrado en Estadísticas desde la Mejora 12.
 
 ### Mejora 05: Confianza Estadística
 
