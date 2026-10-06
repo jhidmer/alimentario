@@ -39,6 +39,12 @@ class _FakeFoodRepository implements FoodRepository {
   Future<FoodSummary?> findByBarcode(String barcode) async => null;
 
   @override
+  Future<FoodSummary?> findById(int foodId) async => null;
+
+  @override
+  Future<void> updateBarcode(int foodId, String? barcode) async {}
+
+  @override
   Future<FoodSummary> create(FoodDraft draft) async => const FoodSummary(id: 2, name: 'Nuevo', categoryId: 1);
 
   @override

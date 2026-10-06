@@ -4,10 +4,11 @@ import '../data/category_repository.dart';
 import '../domain/food_repository.dart';
 
 class NewFoodPage extends StatefulWidget {
-  const NewFoodPage({required this.foodRepository, required this.categoryRepository, super.key});
+  const NewFoodPage({required this.foodRepository, required this.categoryRepository, this.barcode, super.key});
 
   final FoodRepository foodRepository;
   final CategoryRepository categoryRepository;
+  final String? barcode;
 
   @override
   State<NewFoodPage> createState() => _NewFoodPageState();
@@ -16,6 +17,7 @@ class NewFoodPage extends StatefulWidget {
 class _NewFoodPageState extends State<NewFoodPage> {
   final _formKey = GlobalKey<FormState>();
   final _nameController = TextEditingController();
+  late final TextEditingController _barcodeController;
   late Future<List<CategorySummary>> _categories;
   int? _categoryId;
   bool _saving = false;
@@ -24,11 +26,13 @@ class _NewFoodPageState extends State<NewFoodPage> {
   void initState() {
     super.initState();
     _categories = widget.categoryRepository.findAll();
+    _barcodeController = TextEditingController(text: widget.barcode ?? '');
   }
 
   @override
   void dispose() {
     _nameController.dispose();
+    _barcodeController.dispose();
     super.dispose();
   }
 
@@ -36,7 +40,13 @@ class _NewFoodPageState extends State<NewFoodPage> {
     if (!_formKey.currentState!.validate() || _categoryId == null) return;
     setState(() => _saving = true);
     try {
-      await widget.foodRepository.create(FoodDraft(name: _nameController.text, categoryId: _categoryId!));
+      await widget.foodRepository.create(
+        FoodDraft(
+          name: _nameController.text,
+          categoryId: _categoryId!,
+          barcode: _barcodeController.text.trim().isEmpty ? null : _barcodeController.text.trim(),
+        ),
+      );
       if (mounted) Navigator.of(context).pop(true);
     } on FormatException catch (error) {
       if (mounted) _showError(error.message);
@@ -71,6 +81,16 @@ class _NewFoodPageState extends State<NewFoodPage> {
                   textCapitalization: TextCapitalization.sentences,
                   decoration: const InputDecoration(labelText: 'Nombre', hintText: 'Ej. Chocolate'),
                   validator: (value) => value == null || value.trim().isEmpty ? 'Escribe un nombre.' : null,
+                ),
+                const SizedBox(height: 20),
+                TextFormField(
+                  controller: _barcodeController,
+                  keyboardType: TextInputType.number,
+                  decoration: const InputDecoration(
+                    labelText: 'Código de barras',
+                    hintText: 'Opcional',
+                    prefixIcon: Icon(Icons.qr_code_scanner),
+                  ),
                 ),
                 const SizedBox(height: 20),
                 DropdownButtonFormField<int>(

@@ -65,12 +65,41 @@ class FoodRepositoryImpl implements FoodRepository {
   @override
   Future<void> deactivate(int foodId) => _database.foodDao.deactivate(foodId);
 
-  FoodSummary _toSummary(Food food) => FoodSummary(id: food.id, name: food.name, categoryId: food.categoryId, barcode: food.barcode);
+  FoodSummary _toSummary(Food food) => FoodSummary(
+        id: food.id,
+        name: food.name,
+        categoryId: food.categoryId,
+        barcode: food.barcode,
+        usageCount: food.usageCount,
+        lastUsedAt: food.lastUsedAt,
+        createdAt: food.createdAt,
+      );
 
   @override
   Future<FoodSummary?> findByBarcode(String barcode) async {
     final food = await _database.foodDao.findByBarcode(barcode);
     return food == null ? null : _toSummary(food);
+  }
+
+  @override
+  Future<FoodSummary?> findById(int foodId) async {
+    final food = await _database.foodDao.findById(foodId);
+    return food == null ? null : _toSummary(food);
+  }
+
+  @override
+  Future<void> updateBarcode(int foodId, String? barcode) async {
+    final value = barcode?.trim();
+    if (value != null && value.isNotEmpty) {
+      final owner = await _database.foodDao.findByBarcode(value);
+      if (owner != null && owner.id != foodId) {
+        throw const FormatException('Ese código ya pertenece a otro alimento.');
+      }
+    }
+    await _database.foodDao.updateBarcode(
+      foodId,
+      value == null || value.isEmpty ? null : value,
+    );
   }
 }
 

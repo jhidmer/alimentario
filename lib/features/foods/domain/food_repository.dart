@@ -7,12 +7,23 @@ class FoodDraft {
 }
 
 class FoodSummary {
-  const FoodSummary({required this.id, required this.name, required this.categoryId, this.barcode});
+  const FoodSummary({
+    required this.id,
+    required this.name,
+    required this.categoryId,
+    this.barcode,
+    this.usageCount = 0,
+    this.lastUsedAt,
+    this.createdAt,
+  });
 
   final int id;
   final String name;
   final int categoryId;
   final String? barcode;
+  final int usageCount;
+  final DateTime? lastUsedAt;
+  final DateTime? createdAt;
 }
 
 abstract interface class FoodRepository {
@@ -27,4 +38,8 @@ abstract interface class FoodRepository {
   Future<void> deactivate(int foodId);
 
   Future<FoodSummary?> findByBarcode(String barcode);
+
+  Future<FoodSummary?> findById(int foodId);
+
+  Future<void> updateBarcode(int foodId, String? barcode);
 }

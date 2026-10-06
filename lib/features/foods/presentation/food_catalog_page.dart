@@ -4,6 +4,8 @@ import '../../../core/database/database_provider.dart';
 import '../data/category_repository.dart';
 import '../data/food_repository_impl.dart';
 import '../domain/food_repository.dart';
+import 'barcode_scanner_page.dart';
+import 'food_detail_page.dart';
 import 'new_food_page.dart';
 
 class FoodCatalogPage extends StatefulWidget {
@@ -50,10 +52,10 @@ class _FoodCatalogPageState extends State<FoodCatalogPage> {
     return _CatalogData(categories: categories, frequent: frequent, recent: recent);
   }
 
-  Future<void> _createFood() async {
+  Future<void> _createFood({String? barcode}) async {
     final created = await Navigator.of(context).push<bool>(
       MaterialPageRoute(
-        builder: (_) => NewFoodPage(foodRepository: _foods, categoryRepository: _categories),
+        builder: (_) => NewFoodPage(foodRepository: _foods, categoryRepository: _categories, barcode: barcode),
       ),
     );
     if (created == true && mounted) {
@@ -61,10 +63,53 @@ class _FoodCatalogPageState extends State<FoodCatalogPage> {
     }
   }
 
+  Future<void> _openDetail(int foodId) async {
+    await Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (_) => FoodDetailPage(foodRepository: _foods, categoryRepository: _categories, foodId: foodId),
+      ),
+    );
+    if (mounted) _load();
+  }
+
+  Future<void> _scanCode() async {
+    final barcode = await Navigator.of(context).push<String>(
+      MaterialPageRoute(builder: (_) => const BarcodeScannerPage()),
+    );
+    if (barcode == null || !mounted) return;
+    final existing = await _foods.findByBarcode(barcode);
+    if (!mounted) return;
+    if (existing != null) {
+      await _openDetail(existing.id);
+      return;
+    }
+    final create = await showDialog<bool>(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        title: const Text('Código desconocido'),
+        content: Text('No hay ningún alimento con el código $barcode. ¿Crear el alimento ahora?'),
+        actions: [
+          TextButton(onPressed: () => Navigator.of(dialogContext).pop(false), child: const Text('Cancelar')),
+          FilledButton(onPressed: () => Navigator.of(dialogContext).pop(true), child: const Text('Crear')),
+        ],
+      ),
+    );
+    if (create == true && mounted) await _createFood(barcode: barcode);
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Alimentos y categorías')),
+      appBar: AppBar(
+        title: const Text('Alimentos y categorías'),
+        actions: [
+          IconButton(
+            onPressed: _scanCode,
+            icon: const Icon(Icons.qr_code_scanner),
+            tooltip: 'Escanear código',
+          ),
+        ],
+      ),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: _createFood,
         icon: const Icon(Icons.add),
@@ -103,7 +148,7 @@ class _FoodCatalogPageState extends State<FoodCatalogPage> {
                   return _ErrorState(onRetry: _load);
                 }
                 final data = snapshot.data!;
-                return _CatalogContent(data: data, query: _searchController.text);
+                return _CatalogContent(data: data, query: _searchController.text, onOpen: _openDetail);
               },
             ),
           ),
@@ -123,22 +168,23 @@ class _CatalogData {
 }
 
 class _CatalogContent extends StatelessWidget {
-  const _CatalogContent({required this.data, required this.query});
+  const _CatalogContent({required this.data, required this.query, required this.onOpen});
 
   final _CatalogData data;
   final String query;
+  final Future<void> Function(int foodId) onOpen;
 
   @override
   Widget build(BuildContext context) {
     if (query.trim().isNotEmpty) {
-      return _FoodList(title: 'Resultados', foods: data.results);
+      return _FoodList(title: 'Resultados', foods: data.results, onOpen: onOpen);
     }
     return ListView(
       padding: const EdgeInsets.fromLTRB(20, 4, 20, 100),
       children: [
-        _FoodList(title: 'Frecuentes', foods: data.frequent.take(8).toList()),
+        _FoodList(title: 'Frecuentes', foods: data.frequent.take(8).toList(), onOpen: onOpen),
         const SizedBox(height: 20),
-        _FoodList(title: 'Recientes', foods: data.recent.take(8).toList()),
+        _FoodList(title: 'Recientes', foods: data.recent.take(8).toList(), onOpen: onOpen),
         const SizedBox(height: 20),
         Text('Categorías', style: Theme.of(context).textTheme.titleMedium),
         const SizedBox(height: 10),
@@ -153,10 +199,11 @@ class _CatalogContent extends StatelessWidget {
 }
 
 class _FoodList extends StatelessWidget {
-  const _FoodList({required this.title, required this.foods});
+  const _FoodList({required this.title, required this.foods, required this.onOpen});
 
   final String title;
   final List<FoodSummary> foods;
+  final Future<void> Function(int foodId) onOpen;
 
   @override
   Widget build(BuildContext context) {
@@ -170,7 +217,9 @@ class _FoodList extends StatelessWidget {
               child: ListTile(
                 leading: const CircleAvatar(child: Icon(Icons.restaurant)),
                 title: Text(food.name),
+                subtitle: food.barcode == null ? null : Text('Código ${food.barcode}'),
                 trailing: const Icon(Icons.chevron_right),
+                onTap: () => onOpen(food.id),
               ),
             )),
     ]);

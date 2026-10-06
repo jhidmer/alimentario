@@ -215,7 +215,9 @@ Estado: implementado en la pestaña Tendencias.
 
 El formulario de comidas incluye un botón para escanear códigos con la cámara. Si el código ya está asociado a un alimento local, se selecciona automáticamente; si no existe, se ofrece crearlo rápidamente conservando el código. El procesamiento es local y no se consulta información nutricional externa.
 
-Estado: implementado con permiso de cámara y asociación local de códigos.
+El catálogo de alimentos también permite escanear desde la barra superior: abre el detalle del alimento asociado o propone crearlo con el código. El detalle muestra categoría, código, veces registrado y último uso, y permite editar, escanear o quitar el código. El formulario de nuevo alimento admite el código de barras de forma opcional.
+
+Estado: implementado con permiso de cámara, asociación local de códigos y detalle de alimento editable.
 
 ### Mejora 09: Actividad Física
 
